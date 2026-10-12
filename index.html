@@ -187,6 +187,7 @@
                 <div>
                     <label class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Duración</label>
                     <select id="newDays" class="mt-1">
+                        <option value="1">🎁 24 horas GRATIS (prueba)</option>
                         <option value="30" selected>30 días (₡3,000)</option>
                         <option value="60">60 días (₡6,000)</option>
                         <option value="90">90 días (₡9,000)</option>
@@ -459,20 +460,29 @@
         btn.textContent = '⏳ Creando...';
 
         try {
-            const fecha = new Date();
-            fecha.setDate(fecha.getDate() + dias);
+            const refCliente = doc(db, "suscripciones", email);
+            const snapCliente = await getDoc(refCliente);
+            const datosPrevios = snapCliente.exists() ? snapCliente.data() : null;
+
+            const hoy = new Date();
+            const expActual = datosPrevios && datosPrevios.expires_at ? new Date(datosPrevios.expires_at) : hoy;
+            const fechaBase = expActual > hoy ? expActual : hoy;
+            fechaBase.setDate(fechaBase.getDate() + dias);
+
+            const montoActual = dias === 1 ? 0 : dias === 30 ? 3000 : dias === 60 ? 6000 : dias === 90 ? 9000 : dias === 180 ? 18000 : 36000;
+            const totalAcumulado = (datosPrevios && datosPrevios.totalPaid ? Number(datosPrevios.totalPaid) : 0) + montoActual;
 
             const data = {
                 status: "active",
-                expires_at: fecha.toISOString(),
-                devices: [],
-                createdAt: new Date().toISOString(),
+                expires_at: fechaBase.toISOString(),
+                devices: datosPrevios ? (datosPrevios.devices || []) : [],
+                createdAt: datosPrevios && datosPrevios.createdAt ? datosPrevios.createdAt : new Date().toISOString(),
                 lastPayment: new Date().toISOString(),
-                totalPaid: dias === 30 ? 3000 : dias === 60 ? 6000 : dias === 90 ? 9000 : dias === 180 ? 18000 : 36000
+                totalPaid: totalAcumulado
             };
             if (notes) data.notes = notes;
 
-            await setDoc(doc(db, "suscripciones", email), data, { merge: true });
+            await setDoc(refCliente, data, { merge: true });
 
             msg.className = 'text-xs text-emerald-400 font-bold';
             msg.textContent = `✅ Suscripción activada para ${email} por ${dias} días.`;
@@ -506,10 +516,12 @@
                     const base = expActual > hoy ? expActual : hoy;
                     base.setDate(base.getDate() + 30);
 
+                    const nuevoTotal = (Number(data.totalPaid) || 0) + 3000;
                     await updateDoc(ref, {
                         status: "active",
                         expires_at: base.toISOString(),
-                        lastPayment: new Date().toISOString()
+                        lastPayment: new Date().toISOString(),
+                        totalPaid: nuevoTotal
                     });
                     cargarSuscriptores();
                 } catch (err) { alert("Error: " + err.message); }
