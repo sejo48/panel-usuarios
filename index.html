@@ -106,30 +106,79 @@
         .spinner { animation: spin 1s linear infinite; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        /* Adaptación real para móviles: las filas se convierten en tarjetas */
+        /* Tarjetas móviles independientes del algoritmo de tablas HTML */
+        #subsTable td::before { display: none; }
         @media (max-width: 768px) {
-            main { padding: 12px !important; }
-            header { padding: 12px !important; }
+            html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+            #adminPanel, #adminPanel main, #adminPanel section { min-width: 0; }
+            #adminPanel main { padding: 12px !important; }
+            #adminPanel header { padding: 12px !important; }
             header .hide-mobile { display: none !important; }
-            .glass-panel { border-radius: 16px; }
+            #adminPanel header h1 { font-size: 15px; }
+            #adminPanel header .flex { min-width: 0; }
             #adminPanel main > .grid:first-child { gap: 8px; }
-            #adminPanel main > .grid:first-child .glass-panel { padding: 12px; }
+            #adminPanel main > .grid:first-child .glass-panel { padding: 12px; min-width: 0; }
             #adminPanel main > .grid:first-child p.text-2xl { font-size: 1.35rem; }
             #adminPanel h2 { font-size: 1rem; }
-            #subsTable tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; padding: 10px; border-bottom: 1px solid #1e293b; }
-            #subsTable td { display: block; min-width: 0; padding: 8px !important; overflow-wrap: anywhere; }
-            #subsTable td:first-child { grid-column: 1 / -1; font-size: .85rem; max-width: none; border-bottom: 1px solid #1e293b; margin-bottom: 4px; }
-            #subsTable td:nth-child(2), #subsTable td:nth-child(4), #subsTable td:nth-child(5), #subsTable td:nth-child(6) { display: block !important; }
-            #subsTable td:nth-child(7) { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; padding-top: 10px !important; border-top: 1px dashed #334155; margin-top: 4px; }
-            #subsTable td:nth-child(7) button { margin: 0 !important; min-height: 38px; flex: 1 1 42px; }
-            #subsTable td::before { content: attr(data-label); display: block; margin-bottom: 4px; color: #94a3b8; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-            #subsTable td:first-child::before, #subsTable td:nth-child(7)::before { display: none; }
-            #subsTable td[colspan] { grid-column: 1 / -1; text-align: center; }
             #newEmail, #newDays, #newNotes, #searchInput, #filterStatus { font-size: 16px; }
             .btn-primary { min-height: 42px; }
+            /* A table remains a table on desktop; on mobile every row becomes its own card. */
+            .subs-table-shell { overflow: visible !important; border: 0; background: transparent; }
+            .subs-table-scroll { overflow: visible !important; }
+            .subs-table, .subs-table tbody { display: block !important; width: 100% !important; min-width: 0 !important; }
+            .subs-table thead { display: none !important; }
+            #subsTable tr.subscriber-row {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                width: 100%; min-width: 0; gap: 12px 10px;
+                padding: 15px; margin-bottom: 12px;
+                background: rgba(15, 23, 42, .94);
+                border: 1px solid rgba(148, 163, 184, .2);
+                border-radius: 16px;
+            }
+            #subsTable tr.subscriber-row td {
+                display: block !important; min-width: 0 !important; width: auto !important;
+                max-width: none !important; padding: 0 !important;
+                overflow-wrap: normal !important; word-break: normal !important;
+                white-space: normal !important; text-align: left !important;
+            }
+            #subsTable tr.subscriber-row td::before {
+                content: attr(data-label); display: block !important;
+                margin: 0 0 5px; color: #94a3b8;
+                font-size: 10px; font-weight: 800; letter-spacing: .04em;
+                text-transform: uppercase; white-space: normal;
+            }
+            #subsTable tr.subscriber-row td:first-child {
+                grid-column: 1 / -1; padding-bottom: 10px !important;
+                border-bottom: 1px solid #334155;
+            }
+            #subsTable tr.subscriber-row td:first-child::before { content: 'Cliente'; }
+            #subsTable tr.subscriber-row td:first-child .subscriber-email {
+                display: block; font-size: 14px; font-weight: 800;
+                overflow-wrap: anywhere; word-break: break-word;
+            }
+            #subsTable tr.subscriber-row td:nth-child(6) { grid-column: 1 / -1; }
+            #subsTable tr.subscriber-row td:nth-child(6) .subscriber-note {
+                max-width: 100% !important; white-space: normal !important;
+                overflow-wrap: anywhere;
+            }
+            #subsTable tr.subscriber-row td:nth-child(7) {
+                grid-column: 1 / -1; border-top: 1px solid #334155;
+                padding-top: 12px !important;
+            }
+            #subsTable tr.subscriber-row td:nth-child(7)::before { content: 'Acciones'; }
+            .subscriber-actions { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
+            .subscriber-actions button {
+                width: 100%; min-width: 0; min-height: 44px;
+                margin: 0 !important; padding: 7px 2px;
+                display: flex; justify-content: center; align-items: center;
+                font-size: 19px; touch-action: manipulation;
+            }
+            #subsTable tr:not(.subscriber-row) { display: block; }
+            #subsTable tr:not(.subscriber-row) td { display: block; width: 100%; }
         }
         @media (min-width: 769px) {
-            #subsTable td::before { display: none; }
+            .subscriber-actions { display: flex; gap: 4px; justify-content: flex-end; }
         }
         /* Lista de clientes: cuadrícula real, independiente de Tailwind */
         .online-clients-grid {
@@ -288,9 +337,9 @@
         </div>
 
         <!-- ============ TABLA ============ -->
-        <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+        <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden subs-table-shell">
+            <div class="overflow-x-auto subs-table-scroll">
+                <table class="w-full text-sm subs-table">
                     <thead class="bg-slate-900/70 border-b border-slate-800">
                         <tr class="text-left">
                             <th class="p-3 text-[10px] uppercase tracking-widest text-slate-400 font-bold">Correo</th>
@@ -539,13 +588,13 @@
                 ? `<span class="text-slate-500 text-[10px]">Sin registrar</span>`
                 : `<span class="cyber-mono text-[10px] bg-slate-800 border border-slate-700 px-2 py-0.5 rounded" title="${devices[0]}">${devices[0].substring(0, 8)}…</span>`;
 
-            const notes = s.notes ? `<span class="text-[10px] text-amber-300 truncate block max-w-[150px]" title="${s.notes.replace(/"/g,'&quot;')}">📝 ${s.notes}</span>` : `<span class="text-slate-600 text-[10px]">—</span>`;
+            const notes = s.notes ? `<span class="subscriber-note text-[10px] text-amber-300 truncate block max-w-[150px]" title="${s.notes.replace(/"/g,'&quot;')}">📝 ${s.notes}</span>` : `<span class="text-slate-600 text-[10px]">—</span>`;
 
             const waMessage = encodeURIComponent(`Hola! Te escribo de Boxplaytv. Tu suscripción ${isActive ? `vence en ${diasRestantes} días` : 'está vencida'}. ¿Deseas renovar por ₡3,000?`);
             const waLink = `https://wa.me/?text=${waMessage}`;
 
-            return `<tr class="border-b border-slate-800/60 hover:bg-slate-900/40 transition-colors">
-                <td class="p-3 text-xs font-medium text-white truncate max-w-[180px]" title="${s.email}">${s.email}</td>
+            return `<tr class="subscriber-row border-b border-slate-800/60 hover:bg-slate-900/40 transition-colors">
+                <td class="p-3 text-xs font-medium text-white" title="${s.email}"><span class="subscriber-email">${s.email}</span></td>
                 <td class="p-3 hide-mobile" data-label="Estado">${badge}</td>
                 <td class="p-3 text-xs text-slate-300 cyber-mono" data-label="Vencimiento">${exp.toLocaleDateString('es-CR')}</td>
                 <td class="p-3 text-xs hide-mobile" data-label="Días restantes">${diasText}</td>
@@ -556,7 +605,7 @@
                     <button class="btn-secondary mr-1" onclick="editarNota('${s.email}')" title="Editar nota">📝</button>
                     <button class="btn-secondary mr-1" onclick="renovar('${s.email}')" title="Añadir 30 días">🔄</button>
                     <button class="btn-secondary mr-1" onclick="resetDevices('${s.email}')" title="Liberar dispositivo">📱</button>
-                    <button class="btn-danger" onclick="eliminar('${s.email}')" title="Eliminar">🗑️</button>
+                    <button class="btn-danger" onclick="eliminar('${s.email}')" title="Eliminar">🗑️</button></div>
                 </td>
             </tr>`;
         }).join('');
