@@ -420,13 +420,19 @@
             container.innerHTML = '<p class="text-xs text-slate-400 sm:col-span-2 lg:col-span-3">No hay dispositivos reportando actividad en este momento.</p>';
         } else {
             container.innerHTML = online.map(item => {
-                const email = String(item.email || 'Correo no registrado').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+                const emailRaw = String(item.email || '').trim().toLowerCase();
+                const subscription = (window.subsCache || []).find(s => String(s.email || '').trim().toLowerCase() === emailRaw);
+                // Las notas existentes contienen el nombre o referencia elegida por el administrador.
+                const customerName = String(subscription?.notes || '').trim();
+                const escapeHTML = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+                const email = escapeHTML(item.email || 'Correo no registrado');
+                const displayName = escapeHTML(customerName);
                 const device = String(item.deviceId || 'Dispositivo desconocido');
                 const safeDevice = device.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
                 const mins = Math.max(0, Math.floor((now - Number(item.lastSeenMs)) / 60000));
                 const seen = mins === 0 ? 'Hace menos de un minuto' : `Hace ${mins} min`;
                 return `<article class="online-client-card">
-                    <div style="display:flex;align-items:flex-start;gap:10px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#34d399;margin-top:5px;flex-shrink:0;box-shadow:0 0 10px rgba(52,211,153,.45)"></span><div style="min-width:0;flex:1"><p class="client-email" style="font-size:14px;font-weight:800;color:#f8fafc;margin:0">${email}</p><p style="font-size:11px;color:#94a3b8;margin:6px 0 0">${seen}</p></div><span style="font-size:10px;font-weight:800;color:#34d399;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);padding:4px 7px;border-radius:999px;white-space:nowrap">EN LÍNEA</span></div>
+                    <div style="display:flex;align-items:flex-start;gap:10px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#34d399;margin-top:5px;flex-shrink:0;box-shadow:0 0 10px rgba(52,211,153,.45)"></span><div style="min-width:0;flex:1">${displayName ? `<p class="client-email" style="font-size:15px;font-weight:800;color:#f8fafc;margin:0">${displayName}</p><p class="client-email" style="font-size:11px;color:#94a3b8;margin:5px 0 0">${email}</p>` : `<p class="client-email" style="font-size:14px;font-weight:800;color:#f8fafc;margin:0">${email}</p>`}<p style="font-size:11px;color:#94a3b8;margin:6px 0 0">${seen}</p></div><span style="font-size:10px;font-weight:800;color:#34d399;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);padding:4px 7px;border-radius:999px;white-space:nowrap">EN LÍNEA</span></div>
                     <p class="client-device cyber-mono" style="font-size:11px;color:#67e8f9;margin:12px 0 0;padding-top:9px;border-top:1px solid rgba(148,163,184,.12)">Equipo: ${safeDevice}</p>
                 </article>`;
             }).join('');
@@ -514,6 +520,8 @@
             window.subsCache = list;
             renderList();
             updateStats();
+            // Vuelve a mostrar las tarjetas de presencia con el nombre de las Notas.
+            renderPresence();
         } catch (err) {
             console.error(err);
             document.getElementById('subsTable').innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-400 text-xs">Error: ${err.message}</td></tr>`;
