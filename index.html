@@ -131,6 +131,37 @@
         @media (min-width: 769px) {
             #subsTable td::before { display: none; }
         }
+        /* Lista de clientes: cuadrícula real, independiente de Tailwind */
+        .online-clients-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: 12px;
+            width: 100%;
+            align-items: stretch;
+        }
+        .online-client-card {
+            min-width: 0;
+            padding: 14px;
+            border: 1px solid rgba(16, 185, 129, .28);
+            border-radius: 14px;
+            background: linear-gradient(145deg, rgba(15, 23, 42, .98), rgba(2, 6, 23, .94));
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .14);
+            overflow: hidden;
+        }
+        .online-client-card .client-email {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        .online-client-card .client-device {
+            overflow-wrap: anywhere;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+        @media (max-width: 600px) {
+            .online-clients-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+            .online-client-card { padding: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -205,7 +236,7 @@
                 </div>
                 <span id="onlineCount" class="badge-active text-xs font-bold px-3 py-2 rounded-full">0 en línea</span>
             </div>
-            <div id="onlineClients" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div id="onlineClients" class="online-clients-grid">
                 <p class="text-xs text-slate-500">Esperando actividad de los dispositivos…</p>
             </div>
             <p id="presenceStatus" class="text-[11px] text-slate-500">Conectando con el registro de actividad…</p>
@@ -345,9 +376,9 @@
                 const safeDevice = device.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
                 const mins = Math.max(0, Math.floor((now - Number(item.lastSeenMs)) / 60000));
                 const seen = mins === 0 ? 'Hace menos de un minuto' : `Hace ${mins} min`;
-                return `<article class="rounded-xl border border-emerald-500/20 bg-slate-950/60 p-3 min-w-0">
-                    <div class="flex items-start gap-2"><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1 shrink-0"></span><div class="min-w-0 flex-1"><p class="text-sm font-bold text-white break-words">${email}</p><p class="text-[11px] text-slate-400 mt-1">${seen}</p></div></div>
-                    <p class="cyber-mono text-[10px] text-cyan-300 mt-2 break-all">Equipo: ${safeDevice}</p>
+                return `<article class="online-client-card">
+                    <div style="display:flex;align-items:flex-start;gap:10px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#34d399;margin-top:5px;flex-shrink:0;box-shadow:0 0 10px rgba(52,211,153,.45)"></span><div style="min-width:0;flex:1"><p class="client-email" style="font-size:14px;font-weight:800;color:#f8fafc;margin:0">${email}</p><p style="font-size:11px;color:#94a3b8;margin:6px 0 0">${seen}</p></div><span style="font-size:10px;font-weight:800;color:#34d399;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);padding:4px 7px;border-radius:999px;white-space:nowrap">EN LÍNEA</span></div>
+                    <p class="client-device cyber-mono" style="font-size:11px;color:#67e8f9;margin:12px 0 0;padding-top:9px;border-top:1px solid rgba(148,163,184,.12)">Equipo: ${safeDevice}</p>
                 </article>`;
             }).join('');
         }
