@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boxplaytv · Panel de Administración</title>
     <meta name="theme-color" content="#020617">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
+            color-scheme: dark;
             --bg-primary: #020617;
             --bg-card: #0f172a;
             --accent-cyan: #06b6d4;
@@ -20,17 +19,10 @@
         body {
             background: var(--bg-primary);
             color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             min-height: 100vh;
             margin: 0;
         }
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.78);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(148, 163, 184, 0.12);
-        }
-        .cyber-mono { font-family: 'Share Tech Mono', monospace; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
@@ -102,288 +94,316 @@
             font-family: inherit;
         }
         .btn-whatsapp:hover { background: rgba(37,211,102,0.3); }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .spinner { animation: spin 1s linear infinite; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        /* Tarjetas móviles independientes del algoritmo de tablas HTML */
-        #subsTable td::before { display: none; }
-        @media (max-width: 768px) {
-            html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
-            #adminPanel, #adminPanel main, #adminPanel section { min-width: 0; }
-            #adminPanel main { padding: 12px !important; }
-            #adminPanel header { padding: 12px !important; }
-            header .hide-mobile { display: none !important; }
-            #adminPanel header h1 { font-size: 15px; }
-            #adminPanel header .flex { min-width: 0; }
-            #adminPanel main > .grid:first-child { gap: 8px; }
-            #adminPanel main > .grid:first-child .glass-panel { padding: 12px; min-width: 0; }
-            #adminPanel main > .grid:first-child p.text-2xl { font-size: 1.35rem; }
-            #adminPanel h2 { font-size: 1rem; }
-            #newEmail, #newDays, #newNotes, #searchInput, #filterStatus { font-size: 16px; }
-            .btn-primary { min-height: 42px; }
-            /* A table remains a table on desktop; on mobile every row becomes its own card. */
-            .subs-table-shell { overflow: visible !important; border: 0; background: transparent; }
-            .subs-table-scroll { overflow: visible !important; }
-            .subs-table, .subs-table tbody { display: block !important; width: 100% !important; min-width: 0 !important; }
-            .subs-table thead { display: none !important; }
-            #subsTable tr.subscriber-row {
-                display: grid !important;
-                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-                width: 100%; min-width: 0; gap: 12px 10px;
-                padding: 15px; margin-bottom: 12px;
-                background: rgba(15, 23, 42, .94);
-                border: 1px solid rgba(148, 163, 184, .2);
-                border-radius: 16px;
-            }
-            #subsTable tr.subscriber-row td {
-                display: block !important; min-width: 0 !important; width: auto !important;
-                max-width: none !important; padding: 0 !important;
-                overflow-wrap: normal !important; word-break: normal !important;
-                white-space: normal !important; text-align: left !important;
-            }
-            #subsTable tr.subscriber-row td::before {
-                content: attr(data-label); display: block !important;
-                margin: 0 0 5px; color: #94a3b8;
-                font-size: 10px; font-weight: 800; letter-spacing: .04em;
-                text-transform: uppercase; white-space: normal;
-            }
-            #subsTable tr.subscriber-row td:first-child {
-                grid-column: 1 / -1; padding-bottom: 10px !important;
-                border-bottom: 1px solid #334155;
-            }
-            #subsTable tr.subscriber-row td:first-child::before { content: 'Cliente'; }
-            #subsTable tr.subscriber-row td:first-child .subscriber-email {
-                display: block; font-size: 14px; font-weight: 800;
-                overflow-wrap: anywhere; word-break: break-word;
-            }
-            #subsTable tr.subscriber-row td:nth-child(6) { grid-column: 1 / -1; }
-            #subsTable tr.subscriber-row td:nth-child(6) .subscriber-note {
-                max-width: 100% !important; white-space: normal !important;
-                overflow-wrap: anywhere;
-            }
-            #subsTable tr.subscriber-row td:nth-child(7) {
-                grid-column: 1 / -1; border-top: 1px solid #334155;
-                padding-top: 12px !important;
-            }
-            #subsTable tr.subscriber-row td:nth-child(7)::before { content: 'Acciones'; }
-            .subscriber-actions { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
-            .subscriber-actions button {
-                width: 100%; min-width: 0; min-height: 44px;
-                margin: 0 !important; padding: 7px 2px;
-                display: flex; justify-content: center; align-items: center;
-                font-size: 19px; touch-action: manipulation;
-            }
-            #subsTable tr:not(.subscriber-row) { display: block; }
-            #subsTable tr:not(.subscriber-row) td { display: block; width: 100%; }
+        /* La interfaz funciona sin descargar un framework de estilos. */
+        .login-screen { min-height: 100dvh; display: grid; place-items: center; }
+        .login-card { width: 100%; max-width: 380px; padding: 32px 24px; border: 1px solid #164e63; border-radius: 24px; background: #0f172a; text-align: center; }
+        .login-card .brand-mark { margin: 0 auto 20px; width: 52px; height: 52px; }
+        .login-card h1 { font-size: 26px; font-weight: 900; letter-spacing: -.04em; margin: 0; }
+        .login-card h1 span { color: #22d3ee; }
+        .login-subtitle { color: #94a3b8; margin: 8px 0 24px; }
+        .login-card label { display: block; text-align: left; font-size: 15px; margin-bottom: 8px; color: #cbd5e1; }
+        .login-card input { margin-bottom: 18px; }
+        .login-card .btn-primary { width: 100%; }
+        .login-footer { margin-top: 24px; border-top: 1px solid #253248; padding-top: 20px; color: #94a3b8; }
+        #loginError { color: #fda4af; }
+        #adminPanel { min-height: 100dvh; }
+        .confirm-overlay { position: fixed; inset: 0; z-index: 100; padding: 16px; background: #020617d9; backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; }
+        .confirm-card { width: 100%; max-width: 400px; padding: 28px 24px; background: #0f172a; border: 1px solid #164e63; border-radius: 22px; }
+        .confirm-card h3 { font-size: 20px; font-weight: 800; margin: 0 0 16px; }
+        .confirm-card p { font-size: 16px; line-height: 1.7; color: #cbd5e1; margin: 0 0 24px; overflow-wrap: anywhere; }
+        .confirm-actions { display: flex; gap: 12px; }
+        .confirm-actions button { flex: 1; min-height: 48px; }
+        #createMsg[data-state="success"] { color: #6ee7b7; }
+        #createMsg[data-state="error"] { color: #fda4af; }
+        /* Layout del panel: controles cómodos al tacto y secciones independientes. */
+        [hidden], .hidden { display: none !important; }
+        button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+        button, a { touch-action: manipulation; }
+        button:focus-visible, a:focus-visible, summary:focus-visible {
+            outline: 3px solid #67e8f9; outline-offset: 4px;
         }
-        @media (min-width: 769px) {
-            .subscriber-actions { display: flex; gap: 4px; justify-content: flex-end; }
+        input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #22d3ee; outline-offset: 2px; }
+        body { font-size: 16px; line-height: 1.55; }
+        input, select, textarea { font-size: 16px; min-height: 50px; }
+        textarea { resize: vertical; }
+        .btn-primary, .btn-secondary, .btn-danger, .btn-whatsapp {
+            min-height: 44px; font-size: 14px; line-height: 1.4;
         }
-        /* Lista de clientes: cuadrícula real, independiente de Tailwind */
-        .online-clients-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-            gap: 12px;
-            width: 100%;
-            align-items: stretch;
+        #loginScreen { padding: 24px; }
+        #loginScreen p { font-size: 14px; }
+        #loginScreen .btn-primary { min-height: 50px; font-size: 16px; }
+        .admin-header { background: #0b1221; border-bottom: 1px solid #1e293b; }
+        .header-inner { max-width: 1120px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; }
+        .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .brand-mark { width: 42px; height: 42px; border-radius: 13px; background: linear-gradient(135deg, #22d3ee, #14b8a6); color: #042f2e; display: grid; place-items: center; flex-shrink: 0; }
+        .brand h1 { margin: 0; font-size: 18px; font-weight: 900; letter-spacing: -.04em; }
+        .brand h1 span { color: #22d3ee; }
+        .brand p { margin: 0; color: #94a3b8; font-size: 13px; }
+        .header-inner .btn-secondary { padding: 10px 14px; }
+        .panel-nav { max-width: 1072px; margin: 24px auto 0; display: flex; gap: 8px; padding: 6px; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; }
+        .nav-button { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; flex: 1; border-radius: 11px; border: 0; background: transparent; color: #94a3b8; font: inherit; font-weight: 700; cursor: pointer; }
+        .nav-button[aria-current="page"] { background: #153342; color: #67e8f9; }
+        .nav-button svg { width: 21px; height: 21px; }
+        .panel-main { max-width: 1120px; margin: auto; padding: 30px 24px 48px; }
+        .section-heading { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+        .eyebrow { margin: 0 0 6px; color: #5eead4; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+        .section-heading h2 { margin: 0; font-size: clamp(26px, 4vw, 34px); line-height: 1.2; letter-spacing: -.04em; font-weight: 800; }
+        .section-heading p:not(.eyebrow) { margin: 10px 0 0; color: #94a3b8; font-size: 15px; max-width: 540px; }
+        .home-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(240px, 1fr); gap: 24px; align-items: start; }
+        .form-card, .summary-card { background: #0f172a; border: 1px solid #253248; border-radius: 22px; padding: 28px; min-width: 0; }
+        .form-card { border-top: 3px solid #22d3ee; }
+        .card-heading { margin-bottom: 24px; }
+        .card-heading h3, .summary-card h3 { margin: 0; font-size: 19px; font-weight: 800; }
+        .card-heading p { color: #94a3b8; font-size: 14px; margin: 8px 0 0; }
+        .user-form { display: grid; gap: 22px; }
+        .form-field label, .filter-field label { display: block; margin-bottom: 8px; color: #e2e8f0; font-size: 15px; font-weight: 700; }
+        .form-field label span { color: #94a3b8; font-weight: 400; font-size: 14px; }
+        .form-field small { display: block; color: #94a3b8; font-size: 13px; margin-top: 8px; }
+        .form-field input, .form-field select, .form-field textarea { padding: 14px; border-color: #334155; }
+        .form-field textarea { min-height: 96px; }
+        .form-submit { border-top: 1px solid #253248; padding-top: 22px; }
+        .form-submit .btn-primary { width: 100%; min-height: 54px; font-size: 16px; }
+        #createMsg { font-size: 15px; margin-top: 14px; overflow-wrap: anywhere; }
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .stat-card { padding: 16px 12px; background: #080f1f; border-radius: 14px; border: 1px solid #1e293b; }
+        .stat-card p { color: #94a3b8; font-size: 13px; margin: 0; }
+        .stat-card strong { display: block; margin-top: 6px; color: #f1f5f9; font-size: 27px; font-weight: 800; letter-spacing: -.04em; }
+        .stat-card.active strong { color: #34d399; }
+        .stat-card.expired strong { color: #fda4af; }
+        .stat-card.revenue { grid-column: 1 / -1; }
+        .stat-card.revenue strong { color: #67e8f9; }
+        .summary-link { display: flex; justify-content: space-between; width: 100%; background: transparent; color: #67e8f9; border: 0; padding: 12px 0 0; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; min-height: 44px; }
+        .help-note { color: #94a3b8; margin: 20px 4px 0; font-size: 14px; line-height: 1.7; }
+        .help-note strong { color: #cbd5e1; }
+        .users-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 220px auto; gap: 16px; align-items: end; padding: 20px; background: #0f172a; border: 1px solid #253248; border-radius: 18px; margin-bottom: 20px; }
+        .users-toolbar .btn-secondary { min-height: 50px; padding: 10px 16px; }
+        .filter-field { min-width: 0; }
+        .filter-field input, .filter-field select { border-color: #334155; }
+        .users-actions { display: flex; align-items: center; gap: 12px; }
+        .users-actions button { padding: 10px 14px; }
+        .list-count { margin: 0 0 12px; color: #94a3b8; font-size: 14px; }
+        .subs-table-shell { border: 1px solid #253248; background: #0f172a; border-radius: 18px; overflow: hidden; }
+        .subs-table-scroll { overflow-x: auto; }
+        .subs-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .subs-table th { padding: 16px; color: #94a3b8; font-size: 12px; font-weight: 700; background: #101d30; }
+        .subscriber-row { border-bottom: 1px solid #253248; }
+        .subscriber-row:last-child { border-bottom: 0; }
+        .subscriber-row td { padding: 18px 16px; font-size: 14px; vertical-align: top; }
+        .subscriber-email { display: block; color: #f8fafc; font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+        .subscriber-note { color: #cbd5e1; overflow-wrap: anywhere; white-space: normal; }
+        .subscription-badge { display: inline-block; padding: 5px 9px; border-radius: 8px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        .presence-button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; margin-top: 10px; padding: 6px 11px; border: 1px solid #475569; border-radius: 999px; background: #1e293b; color: #cbd5e1; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .presence-button::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+        .presence-button[data-state="online"] { color: #6ee7b7; border-color: #047857; background: #064e3b; }
+        .presence-button[data-state="unknown"] { color: #fcd34d; border-color: #854d0e; background: #422006; }
+        .connection-detail { margin: 10px 0 0; max-width: 260px; color: #94a3b8; font-size: 13px; overflow-wrap: anywhere; }
+        .subscriber-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; min-width: 212px; }
+        .subscriber-actions button { padding: 10px; margin: 0; width: 100%; white-space: nowrap; }
+        .subscriber-actions button:last-child { grid-column: 1 / -1; }
+        .empty-message { padding: 36px 20px; color: #94a3b8; text-align: center; font-size: 15px; }
+        .presence-details { border: 1px solid #253248; border-radius: 18px; background: #0f172a; margin-top: 24px; padding: 20px; }
+        .presence-details summary { cursor: pointer; font-weight: 700; font-size: 16px; min-height: 44px; }
+        .presence-details summary span { display: inline-block; margin-left: 6px; font-size: 13px; font-weight: 500; color: #6ee7b7; }
+        .presence-caption, #presenceStatus { color: #94a3b8; font-size: 14px; margin: 12px 0; }
+        .online-clients-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px; }
+        .online-client-card { min-width: 0; padding: 16px; border: 1px solid #065f46; border-radius: 14px; background: #0b1828; }
+        .client-email, .client-device { overflow-wrap: anywhere; }
+        .online-client-card p { font-size: 14px; margin: 0 0 10px; }
+        #confirmModal > div { max-height: calc(100dvh - 32px); overflow-y: auto; }
+        @media (max-width: 1000px) {
+            .subs-table, .subs-table tbody { display: block; width: 100%; }
+            .subs-table thead { display: none; }
+            .subs-table-shell { border: 0; background: transparent; overflow: visible; }
+            .subs-table-scroll { overflow: visible; }
+            #subsTable { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+            .subscriber-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; background: #0f172a; border: 1px solid #253248 !important; border-radius: 18px; padding: 20px; min-width: 0; }
+            .subscriber-row td { display: block; min-width: 0; padding: 0; font-size: 16px; }
+            .subscriber-row td::before { content: attr(data-label); display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+            .subscriber-row td:first-child, .subscriber-row td:last-child, .subscriber-row td:nth-child(6) { grid-column: 1 / -1; }
+            .subscriber-row td:first-child { padding-bottom: 16px; border-bottom: 1px solid #253248; }
+            .subscriber-row td:first-child::before { display: none; }
+            .subscriber-row td:last-child { padding-top: 16px; border-top: 1px solid #253248; }
+            .subscriber-row td:last-child::before { display: none; }
+            .subscriber-email { font-size: 16px; }
+            .subscriber-actions { min-width: 0; }
+            .subscriber-actions button { min-height: 46px; }
+            .connection-detail { max-width: none; }
+            #subsTable > tr:not(.subscriber-row) { display: block; grid-column: 1 / -1; }
+            #subsTable > tr:not(.subscriber-row) td { display: block; }
         }
-        .online-client-card {
-            min-width: 0;
-            padding: 14px;
-            border: 1px solid rgba(16, 185, 129, .28);
-            border-radius: 14px;
-            background: linear-gradient(145deg, rgba(15, 23, 42, .98), rgba(2, 6, 23, .94));
-            box-shadow: 0 6px 18px rgba(0, 0, 0, .14);
-            overflow: hidden;
+        @media (max-width: 700px) {
+            .header-inner { padding: 16px; }
+            .brand h1 { font-size: 17px; }
+            .brand p { font-size: 12px; }
+            .panel-main { padding: 26px 16px calc(108px + env(safe-area-inset-bottom)); }
+            .panel-nav { position: fixed; z-index: 40; bottom: 0; left: 0; right: 0; margin: 0; max-width: none; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: #0b1221; border-radius: 18px 18px 0 0; border-bottom: 0; box-shadow: 0 -8px 30px #02061780; }
+            .nav-button { flex-direction: column; gap: 3px; min-height: 58px; font-size: 13px; }
+            .section-heading { margin-bottom: 22px; }
+            .section-heading h2 { font-size: 28px; }
+            .home-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+            .form-card, .summary-card { padding: 22px 18px; border-radius: 18px; }
+            .users-toolbar { grid-template-columns: minmax(0, 1fr); padding: 18px; gap: 18px; }
+            .users-toolbar .btn-secondary { width: 100%; }
+            .users-actions { width: 100%; }
+            .users-actions button { flex: 1; }
+            #subsTable { grid-template-columns: minmax(0, 1fr); }
+            .subscriber-row { padding: 20px 18px; }
+            .presence-button { min-height: 44px; font-size: 14px; }
+            .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+            .stat-card { padding: 14px 10px; }
+            .stat-card p { font-size: 12px; }
+            .stat-card strong { font-size: 25px; }
+            .presence-details { padding: 18px; }
         }
-        .online-client-card .client-email {
-            overflow-wrap: anywhere;
-            word-break: break-word;
-            line-height: 1.4;
-        }
-        .online-client-card .client-device {
-            overflow-wrap: anywhere;
-            word-break: break-all;
-            line-height: 1.5;
-        }
-        @media (max-width: 600px) {
-            .online-clients-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-            .online-client-card { padding: 12px; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
         }
     </style>
 </head>
 <body>
 
 <!-- ==================== PANTALLA DE LOGIN ==================== -->
-<div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
-    <div class="glass-panel rounded-3xl p-8 max-w-sm w-full text-center space-y-5 border border-cyan-500/30 animate-fade-in">
-        <div class="flex justify-center">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-600 to-teal-500 flex items-center justify-center shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-7 h-7 fill-white"><polygon points="40,30 70,50 40,70"/></svg>
-            </div>
-        </div>
-        <div>
-            <h1 class="text-2xl font-black">BOXPLAY<span class="text-cyan-400">TV</span></h1>
-            <p class="text-slate-400 text-xs mt-1">Panel de Administración</p>
-        </div>
-        <input type="password" id="adminPass" placeholder="🔒 Contraseña de administrador" autofocus autocomplete="off" />
-        <p id="loginError" class="text-rose-400 text-xs hidden">❌ Contraseña incorrecta</p>
-        <button class="btn-primary w-full" onclick="handleLogin()">🔓 Ingresar</button>
-        <p class="text-[10px] text-slate-500 pt-3 border-t border-slate-800">Solo personal autorizado · Boxplaytv © 2026</p>
-    </div>
+<div id="loginScreen" class="login-screen">
+    <form class="login-card" onsubmit="event.preventDefault(); handleLogin()">
+        <div class="brand-mark" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l12-7z"/></svg></div>
+        <h1>BOXPLAY<span>TV</span></h1>
+        <p class="login-subtitle">Panel de administración</p>
+        <label for="adminPass">Contraseña de administrador</label>
+        <input type="password" id="adminPass" placeholder="Ingresa tu contraseña" autofocus autocomplete="current-password" required />
+        <p id="loginError" class="hidden" role="alert">Contraseña incorrecta. Intenta de nuevo.</p>
+        <button type="submit" class="btn-primary">Ingresar al panel</button>
+        <p class="login-footer">Solo personal autorizado · Boxplaytv © 2026</p>
+    </form>
 </div>
 
 <!-- ==================== PANEL PRINCIPAL ==================== -->
-<div id="adminPanel" class="hidden min-h-screen">
-    <header class="glass-panel border-b border-slate-800 sticky top-0 z-30 px-4 sm:px-8 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-teal-500 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-5 h-5 fill-white"><polygon points="40,30 70,50 40,70"/></svg>
-                </div>
-                <div>
-                    <h1 class="font-black text-base leading-tight">BOXPLAY<span class="text-cyan-400">TV</span> Admin</h1>
-                    <p class="text-[10px] text-slate-400">Gestión de Suscriptores</p>
-                </div>
+<div id="adminPanel" class="hidden">
+    <header class="admin-header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l12-7z"/></svg></div>
+                <div><h1>BOXPLAY<span>TV</span></h1><p>Panel de administración</p></div>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="exportarCSV()" class="btn-secondary hide-mobile">📥 Exportar CSV</button>
-                <button onclick="handleLogout()" class="btn-secondary">🚪 Salir</button>
-            </div>
+            <button onclick="handleLogout()" class="btn-secondary">Salir</button>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 sm:p-8 space-y-6">
+    <nav class="panel-nav" aria-label="Secciones del panel">
+        <button type="button" id="navHome" class="nav-button" aria-current="page" aria-controls="homeSection" onclick="showSection('home')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
+            <span>Inicio</span>
+        </button>
+        <button type="button" id="navUsers" class="nav-button" aria-controls="usersSection" onclick="showSection('users')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-3-5"/></svg>
+            <span>Usuarios</span>
+        </button>
+    </nav>
 
-        <!-- ============ ESTADÍSTICAS ============ -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="glass-panel rounded-2xl p-4 border border-slate-800">
-                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Total Clientes</p>
-                <p id="statTotal" class="text-2xl font-black text-white mt-1">0</p>
+    <main class="panel-main">
+        <section id="homeSection" aria-labelledby="homeHeading">
+            <div class="section-heading">
+                <div><p class="eyebrow">Inicio</p><h2 id="homeHeading" tabindex="-1">Agrega un nuevo usuario</h2><p>Activa una suscripción o renueva una existente desde un solo lugar.</p></div>
             </div>
-            <div class="glass-panel rounded-2xl p-4 border border-emerald-500/30">
-                <p class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold">🟢 Activos</p>
-                <p id="statActive" class="text-2xl font-black text-emerald-400 mt-1">0</p>
-            </div>
-            <div class="glass-panel rounded-2xl p-4 border border-rose-500/30">
-                <p class="text-[10px] uppercase tracking-widest text-rose-400 font-bold">🔴 Vencidos</p>
-                <p id="statExpired" class="text-2xl font-black text-rose-400 mt-1">0</p>
-            </div>
-            <div class="glass-panel rounded-2xl p-4 border border-cyan-500/30">
-                <p class="text-[10px] uppercase tracking-widest text-cyan-400 font-bold">💰 Ingresos/mes</p>
-                <p id="statRevenue" class="text-2xl font-black text-cyan-400 mt-1">₡0</p>
-            </div>
-        </div>
-
-        <!-- ============ CLIENTES EN LÍNEA ============ -->
-        <section class="glass-panel rounded-2xl p-4 sm:p-5 border border-emerald-500/25 space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                    <h2 class="text-base font-black">🟢 Clientes conectados</h2>
-                    <p class="text-xs text-slate-400 mt-1">Actividad actualizada automáticamente. Se considera en línea si reportó actividad en los últimos 90 segundos.</p>
+            <div class="home-layout">
+                <div class="form-card">
+                    <div class="card-heading"><h3>Datos de la suscripción</h3><p>Si el correo ya existe, el tiempo se sumará a su suscripción.</p></div>
+                    <form id="subscriberForm" class="user-form" onsubmit="event.preventDefault(); crearSuscriptor()">
+                        <div class="form-field">
+                            <label for="newEmail">Correo electrónico</label>
+                            <input type="email" id="newEmail" name="email" placeholder="usuario@correo.com" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required aria-describedby="emailHelp" />
+                            <small id="emailHelp">Usa el mismo correo con el que ingresará a la aplicación.</small>
+                        </div>
+                        <div class="form-field">
+                            <label for="newDays">Duración del plan</label>
+                            <select id="newDays" name="duration">
+                                <option value="1">24 horas · Prueba gratis</option>
+                                <option value="30" selected>30 días · ₡3,000</option>
+                                <option value="60">60 días · ₡6,000</option>
+                                <option value="90">90 días · ₡9,000</option>
+                                <option value="180">180 días · ₡18,000</option>
+                                <option value="365">365 días · ₡36,000</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="newNotes">Nombre o notas <span>(opcional)</span></label>
+                            <textarea id="newNotes" name="notes" rows="3" placeholder="Nombre del cliente, teléfono o referencia de pago"></textarea>
+                        </div>
+                        <div class="form-submit">
+                            <button id="createBtn" type="submit" class="btn-primary">Activar usuario</button>
+                            <p id="createMsg" class="hidden" role="status" aria-live="polite"></p>
+                        </div>
+                    </form>
                 </div>
-                <span id="onlineCount" class="badge-active text-xs font-bold px-3 py-2 rounded-full">0 en línea</span>
+                <aside>
+                    <div class="summary-card">
+                        <h3>Tu panel de un vistazo</h3>
+                        <div class="summary-grid">
+                            <div class="stat-card"><p>Usuarios</p><strong id="statTotal">—</strong></div>
+                            <div class="stat-card active"><p>Activos</p><strong id="statActive">—</strong></div>
+                            <div class="stat-card expired"><p>Vencidos</p><strong id="statExpired">—</strong></div>
+                            <div class="stat-card revenue"><p>Ingresos estimados / mes</p><strong id="statRevenue">—</strong></div>
+                        </div>
+                        <button type="button" class="summary-link" onclick="showSection('users')">Ver lista de usuarios <span aria-hidden="true">→</span></button>
+                    </div>
+                    <p class="help-note"><strong>Una suscripción, un dispositivo.</strong><br>Podrás renovar, editar notas o liberar el equipo desde la sección Usuarios.</p>
+                </aside>
             </div>
-            <div id="onlineClients" class="online-clients-grid">
-                <p class="text-xs text-slate-500">Esperando actividad de los dispositivos…</p>
-            </div>
-            <p id="presenceStatus" class="text-[11px] text-slate-500">Conectando con el registro de actividad…</p>
         </section>
 
-        <!-- ============ CREAR / RENOVAR ============ -->
-        <div class="glass-panel rounded-2xl p-5 sm:p-6 border border-slate-800 space-y-4">
-            <div class="flex items-center gap-3">
-                <div class="w-1.5 h-6 bg-cyan-500 rounded-full shadow-[0_0_15px_#06b6d4]"></div>
-                <h2 class="text-lg font-black">➕ Crear / Renovar Suscriptor</h2>
+        <section id="usersSection" aria-labelledby="usersHeading" hidden>
+            <div class="section-heading">
+                <div><p class="eyebrow">Usuarios</p><h2 id="usersHeading" tabindex="-1">Tus usuarios, al día</h2><p>Consulta sus suscripciones y quién está en línea.</p></div>
+                <div class="users-actions"><button type="button" class="btn-secondary" onclick="exportarCSV()">Exportar CSV</button><button type="button" class="btn-primary" onclick="showSection('home'); document.getElementById('newEmail').focus()">+ Nuevo usuario</button></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div class="md:col-span-2">
-                    <label class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Correo del cliente</label>
-                    <input type="email" id="newEmail" placeholder="cliente@gmail.com" class="mt-1" autocomplete="off" />
-                </div>
-                <div>
-                    <label class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Duración</label>
-                    <select id="newDays" class="mt-1">
-                        <option value="1">🎁 24 horas GRATIS (prueba)</option>
-                        <option value="30" selected>30 días (₡3,000)</option>
-                        <option value="60">60 días (₡6,000)</option>
-                        <option value="90">90 días (₡9,000)</option>
-                        <option value="180">180 días (₡18,000)</option>
-                        <option value="365">365 días (₡36,000)</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button id="createBtn" class="btn-primary w-full" onclick="crearSuscriptor()">✅ Activar</button>
-                </div>
+            <div class="users-toolbar">
+                <div class="filter-field"><label for="searchInput">Buscar usuario</label><input type="search" id="searchInput" placeholder="Correo, nombre o nota" oninput="renderList()" /></div>
+                <div class="filter-field"><label for="filterStatus">Filtrar por</label><select id="filterStatus" onchange="renderList()">
+                    <option value="all">Todos los usuarios</option><option value="online">En línea</option><option value="active">Suscripción activa</option><option value="expired">Suscripción vencida</option><option value="expiring">Vencen en 7 días</option>
+                </select></div>
+                <button type="button" class="btn-secondary" onclick="cargarSuscriptores()">Actualizar lista</button>
             </div>
-            <div>
-                <label class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Notas (opcional)</label>
-                <input type="text" id="newNotes" placeholder="Ej: Pagó por SINPE el 11/10, WhatsApp: 8888-8888" class="mt-1" />
-            </div>
-            <p id="createMsg" class="text-xs hidden"></p>
-        </div>
-
-        <!-- ============ FILTROS ============ -->
-        <div class="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-col sm:flex-row gap-3">
-            <input type="text" id="searchInput" placeholder="🔍 Buscar por correo o nota..." class="flex-1" oninput="renderList()" />
-            <select id="filterStatus" class="sm:w-48" onchange="renderList()">
-                <option value="all">Todos los estados</option>
-                <option value="active">🟢 Solo activos</option>
-                <option value="expired">🔴 Solo vencidos</option>
-                <option value="expiring">⚠️ Vencen en 7 días</option>
-            </select>
-            <button class="btn-secondary" onclick="cargarSuscriptores()">🔄 Refrescar</button>
-        </div>
-
-        <!-- ============ TABLA ============ -->
-        <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden subs-table-shell">
-            <div class="overflow-x-auto subs-table-scroll">
-                <table class="w-full text-sm subs-table">
-                    <thead class="bg-slate-900/70 border-b border-slate-800">
-                        <tr class="text-left">
-                            <th class="p-3 text-[10px] uppercase tracking-widest text-slate-400 font-bold">Correo</th>
-                            <th class="p-3 text-[10px] uppercase tracking-widest text-slate-400 font-bold hide-mobile">Estado</th>
-                            <th class="p-3 text-[10px] uppercase tracking-widest text-slate-400 font-bold">Vence</th>
-                            <th class="p-3 text-[10px] uppercase tracking-widest text-slate-400 font-bold hide-mobile">Días</th>
-                            <th class="p-3 text-[10px] uppercase tracking-widest text-slate-400 font-bold hide-mobile">Dispositivo</th>
-                            <th class="p-3 text-[10px] uppercase tracking-widest text-slate-400 font-bold hide-mobile">Notas</th>
-                            <th class="p-3 text-[10px] uppercase tracking-widest text-slate-400 font-bold text-right">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="subsTable">
-                        <tr><td colspan="7" class="p-8 text-center text-slate-500">
-                            <div class="spinner w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full mx-auto"></div>
-                            <p class="mt-2 text-xs">Cargando suscriptores...</p>
-                        </td></tr>
-                    </tbody>
+            <p id="listCount" class="list-count" role="status">Cargando usuarios…</p>
+            <div class="subs-table-shell"><div class="subs-table-scroll">
+                <table class="subs-table" aria-label="Lista de usuarios">
+                    <thead><tr><th scope="col">Usuario / conexión</th><th scope="col">Suscripción</th><th scope="col">Vencimiento</th><th scope="col">Tiempo restante</th><th scope="col">Dispositivo</th><th scope="col">Notas</th><th scope="col">Acciones</th></tr></thead>
+                    <tbody id="subsTable"><tr><td colspan="7" class="empty-message">Cargando usuarios…</td></tr></tbody>
                 </table>
-            </div>
-        </div>
-
-        <!-- ============ INFO EXTRA ============ -->
-        <div class="glass-panel rounded-2xl p-4 border border-slate-800 text-xs text-slate-400 space-y-1">
-            <p>💡 <strong>Tips:</strong></p>
-            <p>• <strong>1 suscripción = 1 dispositivo.</strong> Si un cliente cambia de equipo, usa el botón 📱 para liberar el anterior.</p>
-            <p>• <strong>Renovar</strong> suma 30 días a la fecha actual (o a la de vencimiento si aún está activo).</p>
-            <p>• <strong>Eliminar</strong> borra completamente al cliente. No se puede deshacer.</p>
-            <p>• Los cambios se guardan automáticamente en Firestore.</p>
-        </div>
-
+            </div></div>
+            <details class="presence-details">
+                <summary>Actividad de dispositivos <span id="onlineCount">Conectando…</span></summary>
+                <p class="presence-caption">Un dispositivo está en línea si reportó actividad en los últimos 90 segundos.</p>
+                <div id="onlineClients" class="online-clients-grid"><p class="presence-caption">Esperando actividad…</p></div>
+                <p id="presenceStatus" role="status">Conectando con el registro de actividad…</p>
+            </details>
+            <p class="help-note">Renovar suma 30 días. Liberar equipo permite usar otro dispositivo. Eliminar un usuario requiere confirmación.</p>
+        </section>
     </main>
 </div>
 
 <!-- ==================== MODAL DE CONFIRMACIÓN ==================== -->
-<div id="confirmModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="glass-panel rounded-3xl p-6 max-w-sm w-full space-y-4 border border-cyan-500/30 text-center animate-fade-in">
-        <h3 id="confirmTitle" class="text-lg font-black">¿Estás seguro?</h3>
-        <p id="confirmMsg" class="text-sm text-slate-300 leading-relaxed"></p>
-        <div class="flex gap-3">
-            <button class="btn-secondary flex-1 py-3" onclick="closeConfirm()">Cancelar</button>
-            <button id="confirmBtn" class="btn-primary flex-1 py-3">Confirmar</button>
+<div id="confirmModal" class="hidden confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMsg">
+    <div class="confirm-card">
+        <h3 id="confirmTitle">¿Estás seguro?</h3>
+        <p id="confirmMsg"></p>
+        <div class="confirm-actions">
+            <button type="button" id="cancelConfirm" class="btn-secondary" onclick="closeConfirm()">Cancelar</button>
+            <button type="button" id="confirmBtn" class="btn-primary">Confirmar</button>
         </div>
     </div>
 </div>
+
+<script>
+    window.showSection = (section) => {
+        const users = section === 'users';
+        document.getElementById('homeSection').hidden = users;
+        document.getElementById('usersSection').hidden = !users;
+        document.getElementById('navHome').toggleAttribute('aria-current', !users);
+        document.getElementById('navUsers').toggleAttribute('aria-current', users);
+        document.getElementById(users ? 'navUsers' : 'navHome').setAttribute('aria-current', 'page');
+        document.getElementById(users ? 'usersHeading' : 'homeHeading').focus({ preventScroll: true });
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    };
+</script>
 
 <!-- ==================== FIREBASE ==================== -->
 <script type="module">
@@ -407,33 +427,88 @@
     let presenceUnsubscribe = null;
     let presenceRefreshTimer = null;
     let latestPresence = [];
+    let presenceState = 'loading';
+
+    const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const normalizeEmail = value => String(value || '').trim().toLowerCase();
+    const isRecentPresence = item => {
+        const age = Date.now() - Number(item.lastSeenMs);
+        return Number(item.lastSeenMs) > 0 && age >= 0 && age <= 90000;
+    };
+
+    function connectionFor(email) {
+        if (presenceState !== 'ready') return {
+            state: 'unknown', label: presenceState === 'error' ? 'Sin información' : 'Consultando…',
+            detail: presenceState === 'error' ? 'No se pudo consultar la conexión. Intenta actualizar la página.' : 'Esperando el registro de actividad del dispositivo.'
+        };
+        const entries = latestPresence.filter(item => normalizeEmail(item.email) === normalizeEmail(email));
+        const online = entries.find(isRecentPresence);
+        if (online) return { state: 'online', label: 'En línea', detail: `Actividad en los últimos 90 segundos. Equipo: ${online.deviceId || 'sin identificar'}.` };
+        return { state: 'offline', label: 'Desconectado', detail: 'No se ha recibido actividad de este usuario en los últimos 90 segundos.' };
+    }
+
+    function updateConnectionBadges() {
+        if (document.getElementById('filterStatus').value === 'online') {
+            window.renderList();
+            return;
+        }
+        document.querySelectorAll('[data-presence-email]').forEach(button => {
+            const connection = connectionFor(button.dataset.presenceEmail);
+            button.dataset.state = connection.state;
+            button.textContent = connection.label;
+            button.setAttribute('aria-label', `${connection.label}: ${button.dataset.presenceEmail}. Ver detalle de conexión`);
+            document.getElementById(button.getAttribute('aria-controls')).textContent = connection.detail;
+        });
+    }
+
+    document.getElementById('subsTable').addEventListener('click', event => {
+        const button = event.target.closest('button');
+        if (!button) return;
+        if (button.hasAttribute('data-presence-email')) {
+            const detail = document.getElementById(button.getAttribute('aria-controls'));
+            detail.hidden = !detail.hidden;
+            button.setAttribute('aria-expanded', String(!detail.hidden));
+            return;
+        }
+        const email = button.closest('[data-email]')?.dataset.email;
+        const actions = { note: window.editarNota, renew: window.renovar, device: window.resetDevices, delete: window.eliminar };
+        if (email && actions[button.dataset.action]) actions[button.dataset.action](email);
+        if (email && button.dataset.action === 'whatsapp') {
+            const sub = window.subsCache.find(item => item.email === email);
+            const days = Math.ceil((new Date(sub.expires_at) - new Date()) / 86400000);
+            const active = sub.status === 'active' && new Date(sub.expires_at) >= new Date();
+            const message = `Hola! Te escribo de Boxplaytv. Tu suscripción ${active ? `vence en ${days} días` : 'está vencida'}. ¿Deseas renovar por ₡3,000?`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+        }
+    });
 
     function renderPresence() {
-        const now = Date.now();
-        const online = latestPresence.filter(item => Number(item.lastSeenMs) && now - Number(item.lastSeenMs) <= 90000);
+        const online = presenceState === 'ready' ? latestPresence.filter(isRecentPresence) : [];
         const container = document.getElementById('onlineClients');
         const count = document.getElementById('onlineCount');
         const status = document.getElementById('presenceStatus');
         if (!container || !count || !status) return;
+        updateConnectionBadges();
+        if (presenceState !== 'ready') {
+            count.textContent = presenceState === 'error' ? 'Sin información' : 'Conectando…';
+            container.innerHTML = '<p class="presence-caption">La actividad de los dispositivos todavía no está disponible.</p>';
+            return;
+        }
         count.textContent = `${online.length} en línea`;
         if (!online.length) {
-            container.innerHTML = '<p class="text-xs text-slate-400 sm:col-span-2 lg:col-span-3">No hay dispositivos reportando actividad en este momento.</p>';
+            container.innerHTML = '<p class="presence-caption">No hay dispositivos reportando actividad en este momento.</p>';
         } else {
             container.innerHTML = online.map(item => {
                 const emailRaw = String(item.email || '').trim().toLowerCase();
                 const subscription = (window.subsCache || []).find(s => String(s.email || '').trim().toLowerCase() === emailRaw);
-                // Las notas existentes contienen el nombre o referencia elegida por el administrador.
-                const customerName = String(subscription?.notes || '').trim();
-                const escapeHTML = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+                const displayName = escapeHTML(subscription?.notes || '');
                 const email = escapeHTML(item.email || 'Correo no registrado');
-                const displayName = escapeHTML(customerName);
-                const device = String(item.deviceId || 'Dispositivo desconocido');
-                const safeDevice = device.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-                const mins = Math.max(0, Math.floor((now - Number(item.lastSeenMs)) / 60000));
-                const seen = mins === 0 ? 'Hace menos de un minuto' : `Hace ${mins} min`;
+                const device = escapeHTML(item.deviceId || 'Dispositivo desconocido');
                 return `<article class="online-client-card">
-                    <div style="display:flex;align-items:flex-start;gap:10px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#34d399;margin-top:5px;flex-shrink:0;box-shadow:0 0 10px rgba(52,211,153,.45)"></span><div style="min-width:0;flex:1">${displayName ? `<p class="client-email" style="font-size:15px;font-weight:800;color:#f8fafc;margin:0">${displayName}</p><p class="client-email" style="font-size:11px;color:#94a3b8;margin:5px 0 0">${email}</p>` : `<p class="client-email" style="font-size:14px;font-weight:800;color:#f8fafc;margin:0">${email}</p>`}<p style="font-size:11px;color:#94a3b8;margin:6px 0 0">${seen}</p></div><span style="font-size:10px;font-weight:800;color:#34d399;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);padding:4px 7px;border-radius:999px;white-space:nowrap">EN LÍNEA</span></div>
-                    <p class="client-device cyber-mono" style="font-size:11px;color:#67e8f9;margin:12px 0 0;padding-top:9px;border-top:1px solid rgba(148,163,184,.12)">Equipo: ${safeDevice}</p>
+                    <p class="client-email"><strong>${email}</strong></p>
+                    ${displayName ? `<p class="client-email">${displayName}</p>` : ''}
+                    <p class="client-device">Equipo: ${device}</p>
+                    <p class="presence-caption">Actividad en los últimos 90 segundos</p>
                 </article>`;
             }).join('');
         }
@@ -444,17 +519,23 @@
         if (presenceUnsubscribe) presenceUnsubscribe();
         if (presenceRefreshTimer) clearInterval(presenceRefreshTimer);
         const status = document.getElementById('presenceStatus');
+        presenceState = 'loading';
         try {
             presenceUnsubscribe = onSnapshot(collection(db, 'presencia'), snap => {
                 latestPresence = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                presenceState = 'ready';
                 renderPresence();
             }, err => {
+                presenceState = 'error';
+                renderPresence();
                 console.error('Error leyendo presencia:', err);
                 if (status) status.textContent = 'No se pudo leer la presencia. Revise las reglas de acceso de Firestore.';
             });
             presenceRefreshTimer = setInterval(renderPresence, 15000);
         } catch (err) {
             console.error(err);
+            presenceState = 'error';
+            renderPresence();
             if (status) status.textContent = 'No se pudo iniciar el registro de actividad.';
         }
     }
@@ -504,10 +585,6 @@
         window.addEventListener('load', () => { cargarSuscriptores(); iniciarEscuchaPresencia(); });
     }
 
-    document.getElementById('adminPass')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
-
     // ============================================
     // CARGAR SUSCRIPTORES
     // ============================================
@@ -524,7 +601,8 @@
             renderPresence();
         } catch (err) {
             console.error(err);
-            document.getElementById('subsTable').innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-400 text-xs">Error: ${err.message}</td></tr>`;
+            document.getElementById('listCount').textContent = 'No se pudo actualizar la lista.';
+            document.getElementById('subsTable').innerHTML = `<tr><td colspan="7" class="empty-message">No se pudieron cargar los usuarios. Revisa la conexión e intenta actualizar la lista.</td></tr>`;
         }
     };
 
@@ -543,78 +621,59 @@
         const search = document.getElementById('searchInput').value.toLowerCase().trim();
         const filterStatus = document.getElementById('filterStatus').value;
         const hoy = new Date();
+        let list = window.subsCache.filter(s =>
+            normalizeEmail(s.email).includes(search) || String(s.notes || '').toLowerCase().includes(search)
+        );
 
-        let list = window.subsCache.filter(s => {
-            const matchEmail = s.email.toLowerCase().includes(search);
-            const matchNotes = (s.notes || '').toLowerCase().includes(search);
-            return matchEmail || matchNotes;
-        });
-
-        if (filterStatus === 'active') {
+        if (filterStatus === 'online') {
+            list = list.filter(s => connectionFor(s.email).state === 'online');
+        } else if (filterStatus === 'active') {
             list = list.filter(s => s.status === 'active' && new Date(s.expires_at) >= hoy);
         } else if (filterStatus === 'expired') {
             list = list.filter(s => s.status !== 'active' || new Date(s.expires_at) < hoy);
         } else if (filterStatus === 'expiring') {
             list = list.filter(s => {
-                if (s.status !== 'active') return false;
-                const dias = Math.ceil((new Date(s.expires_at) - hoy) / (1000 * 60 * 60 * 24));
-                return dias >= 0 && dias <= 7;
+                const days = Math.ceil((new Date(s.expires_at) - hoy) / 86400000);
+                return s.status === 'active' && days >= 0 && days <= 7;
             });
         }
-
+        document.getElementById('listCount').textContent = `${list.length} ${list.length === 1 ? 'usuario' : 'usuarios'} · ${window.subsCache.length} en total`;
         const tbody = document.getElementById('subsTable');
-
-        if (list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-500 text-xs">No hay suscriptores que coincidan con el filtro.</td></tr>`;
+        if (!list.length) {
+            const message = filterStatus === 'online' && presenceState !== 'ready'
+                ? 'La información de conexión aún no está disponible.'
+                : !window.subsCache.length ? 'Todavía no hay usuarios. Agrega el primero desde Inicio.' : 'No hay usuarios que coincidan con tu búsqueda o filtro.';
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-message">${message}</td></tr>`;
             return;
         }
-
-        tbody.innerHTML = list.map(s => {
+        tbody.innerHTML = list.map((s, index) => {
             const exp = new Date(s.expires_at);
-            const diasRestantes = Math.ceil((exp - hoy) / (1000 * 60 * 60 * 24));
-            const isActive = s.status === 'active' && exp >= hoy;
-            const isExpiringSoon = isActive && diasRestantes <= 7;
-
-            let badge = '';
-            if (!isActive) {
-                badge = `<span class="badge-expired text-[10px] font-bold px-2 py-1 rounded-full">VENCIDO</span>`;
-            } else if (isExpiringSoon) {
-                badge = `<span class="badge-pending text-[10px] font-bold px-2 py-1 rounded-full">⚠️ POR VENCER</span>`;
-            } else {
-                badge = `<span class="badge-active text-[10px] font-bold px-2 py-1 rounded-full">ACTIVO</span>`;
-            }
-
-            let diasText = '';
-            if (isActive) {
-                diasText = `<span class="text-emerald-400 font-bold">${diasRestantes} días</span>`;
-            } else {
-                diasText = `<span class="text-rose-400">Expirado hace ${Math.abs(diasRestantes)}d</span>`;
-            }
-
+            const days = Math.ceil((exp - hoy) / 86400000);
+            const active = s.status === 'active' && exp >= hoy;
+            const expiring = active && days <= 7;
+            const badge = `<span class="subscription-badge ${!active ? 'badge-expired' : expiring ? 'badge-pending' : 'badge-active'}">${!active ? 'Vencida' : expiring ? 'Por vencer' : 'Activa'}</span>`;
+            const daysText = active ? `${days} días` : 'Vencida';
             const devices = Array.isArray(s.devices) ? s.devices : [];
-            const deviceText = devices.length === 0
-                ? `<span class="text-slate-500 text-[10px]">Sin registrar</span>`
-                : `<span class="cyber-mono text-[10px] bg-slate-800 border border-slate-700 px-2 py-0.5 rounded" title="${devices[0]}">${devices[0].substring(0, 8)}…</span>`;
-
-            const notes = s.notes ? `<span class="subscriber-note text-[10px] text-amber-300 truncate block max-w-[150px]" title="${s.notes.replace(/"/g,'&quot;')}">📝 ${s.notes}</span>` : `<span class="text-slate-600 text-[10px]">—</span>`;
-
-            const waMessage = encodeURIComponent(`Hola! Te escribo de Boxplaytv. Tu suscripción ${isActive ? `vence en ${diasRestantes} días` : 'está vencida'}. ¿Deseas renovar por ₡3,000?`);
-            const waLink = `https://wa.me/?text=${waMessage}`;
-
-            return `<tr class="subscriber-row border-b border-slate-800/60 hover:bg-slate-900/40 transition-colors">
-                <td class="p-3 text-xs font-medium text-white" title="${s.email}"><span class="subscriber-email">${s.email}</span></td>
-                <td class="p-3 hide-mobile" data-label="Estado">${badge}</td>
-                <td class="p-3 text-xs text-slate-300 cyber-mono" data-label="Vencimiento">${exp.toLocaleDateString('es-CR')}</td>
-                <td class="p-3 text-xs hide-mobile" data-label="Días restantes">${diasText}</td>
-                <td class="p-3 hide-mobile" data-label="Dispositivo">${deviceText}</td>
-                <td class="p-3 hide-mobile" data-label="Notas">${notes}</td>
-                <td class="p-3 text-right whitespace-nowrap" data-label="Acciones">
-                    <button class="btn-whatsapp mr-1" onclick="window.open('${waLink}','_blank')" title="Enviar WhatsApp">💬</button>
-                    <button class="btn-secondary mr-1" onclick="editarNota('${s.email}')" title="Editar nota">📝</button>
-                    <button class="btn-secondary mr-1" onclick="renovar('${s.email}')" title="Añadir 30 días">🔄</button>
-                    <button class="btn-secondary mr-1" onclick="resetDevices('${s.email}')" title="Liberar dispositivo">📱</button>
-                    <button class="btn-danger" onclick="eliminar('${s.email}')" title="Eliminar">🗑️</button></div>
+            const device = String(devices[0] || '');
+            const connection = connectionFor(s.email);
+            const email = escapeHTML(s.email);
+            return `<tr class="subscriber-row" data-email="${email}">
+                <td><span class="subscriber-email">${email}</span>
+                    <button type="button" class="presence-button" data-presence-email="${email}" data-state="${connection.state}" aria-label="${connection.label}: ${email}. Ver detalle de conexión" aria-expanded="false" aria-controls="connection-${index}">${connection.label}</button>
+                    <p id="connection-${index}" class="connection-detail" hidden>${escapeHTML(connection.detail)}</p>
                 </td>
+                <td data-label="Suscripción">${badge}</td>
+                <td data-label="Vencimiento">${exp.toLocaleDateString('es-CR')}</td>
+                <td data-label="Tiempo restante">${daysText}</td>
+                <td data-label="Dispositivo"><span title="${escapeHTML(device)}">${device ? escapeHTML(device.slice(0, 12)) + (device.length > 12 ? '…' : '') : 'Sin registrar'}</span></td>
+                <td data-label="Nombre o notas"><span class="subscriber-note">${escapeHTML(s.notes || 'Sin notas')}</span></td>
+                <td><div class="subscriber-actions">
+                    <button type="button" class="btn-secondary" data-action="renew">Renovar</button>
+                    <button type="button" class="btn-whatsapp" data-action="whatsapp">WhatsApp</button>
+                    <button type="button" class="btn-secondary" data-action="note">Editar nota</button>
+                    <button type="button" class="btn-secondary" data-action="device">Liberar equipo</button>
+                    <button type="button" class="btn-danger" data-action="delete">Eliminar usuario</button>
+                </div></td>
             </tr>`;
         }).join('');
     };
@@ -629,8 +688,9 @@
         const msg = document.getElementById('createMsg');
         const btn = document.getElementById('createBtn');
 
-        if (!email || !email.includes('@')) {
-            msg.className = 'text-xs text-rose-400';
+        if (!document.getElementById('newEmail').checkValidity()) {
+            msg.classList.remove('hidden');
+            msg.dataset.state = 'error';
             msg.textContent = '⚠️ Ingresa un correo válido.';
             return;
         }
@@ -663,18 +723,20 @@
 
             await setDoc(refCliente, data, { merge: true });
 
-            msg.className = 'text-xs text-emerald-400 font-bold';
+            msg.classList.remove('hidden');
+            msg.dataset.state = 'success';
             msg.textContent = `✅ Suscripción activada para ${email} por ${dias} días.`;
             document.getElementById('newEmail').value = '';
             document.getElementById('newNotes').value = '';
             cargarSuscriptores();
-            setTimeout(() => msg.classList.add('hidden'), 5000);
+
         } catch (err) {
-            msg.className = 'text-xs text-rose-400';
+            msg.classList.remove('hidden');
+            msg.dataset.state = 'error';
             msg.textContent = '❌ Error: ' + err.message;
         } finally {
             btn.disabled = false;
-            btn.textContent = '✅ Activar';
+            btn.textContent = 'Activar usuario';
         }
     };
 
@@ -792,16 +854,29 @@
     // MODAL DE CONFIRMACIÓN
     // ============================================
     let confirmCallback = null;
+    let confirmTrigger = null;
     window.showConfirm = (title, msg, cb) => {
+        confirmTrigger = document.activeElement;
         document.getElementById('confirmTitle').textContent = title;
         document.getElementById('confirmMsg').textContent = msg;
         document.getElementById('confirmModal').classList.remove('hidden');
         confirmCallback = cb;
+        document.getElementById('cancelConfirm').focus();
     };
     window.closeConfirm = () => {
         document.getElementById('confirmModal').classList.add('hidden');
         confirmCallback = null;
+        if (confirmTrigger?.isConnected) confirmTrigger.focus({ preventScroll: true });
     };
+    document.getElementById('confirmModal').addEventListener('keydown', event => {
+        if (event.key === 'Escape') { event.preventDefault(); closeConfirm(); }
+        if (event.key === 'Tab') {
+            event.preventDefault();
+            const cancel = document.getElementById('cancelConfirm');
+            const confirm = document.getElementById('confirmBtn');
+            (document.activeElement === cancel ? confirm : cancel).focus();
+        }
+    });
     document.getElementById('confirmBtn').onclick = () => {
         if (confirmCallback) confirmCallback();
         closeConfirm();
