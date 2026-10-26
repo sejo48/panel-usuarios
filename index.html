@@ -219,7 +219,7 @@
             .subscriber-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; background: #0f172a; border: 1px solid #253248 !important; border-radius: 18px; padding: 20px; min-width: 0; }
             .subscriber-row td { display: block; min-width: 0; padding: 0; font-size: 16px; }
             .subscriber-row td::before { content: attr(data-label); display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
-            .subscriber-row td:first-child, .subscriber-row td:last-child, .subscriber-row td:nth-child(6) { grid-column: 1 / -1; }
+            .subscriber-row td:first-child, .subscriber-row td:last-child, .subscriber-row td:nth-child(7) { grid-column: 1 / -1; }
             .subscriber-row td:first-child { padding-bottom: 16px; border-bottom: 1px solid #253248; }
             .subscriber-row td:first-child::before { display: none; }
             .subscriber-row td:last-child { padding-top: 16px; border-top: 1px solid #253248; }
@@ -258,6 +258,12 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; }
         }
+        .opening-counts { min-width: 150px; }
+        .opening-counts p { margin: 0 0 6px; }
+        .opening-counts details { margin-top: 10px; }
+        .opening-counts summary { cursor: pointer; color: #67e8f9; }
+        .opening-days { padding-left: 18px; max-height: 180px; overflow-y: auto; }
+        #openingsStatus { color: #94a3b8; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -362,11 +368,12 @@
                 </select></div>
                 <button type="button" class="btn-secondary" onclick="cargarSuscriptores()">Actualizar lista</button>
             </div>
+            <p id="openingsStatus" role="status">Consultando aperturas del mes…</p>
             <p id="listCount" class="list-count" role="status">Cargando usuarios…</p>
             <div class="subs-table-shell"><div class="subs-table-scroll">
                 <table class="subs-table" aria-label="Lista de usuarios">
-                    <thead><tr><th scope="col">Usuario / conexión</th><th scope="col">Suscripción</th><th scope="col">Vencimiento</th><th scope="col">Tiempo restante</th><th scope="col">Dispositivo</th><th scope="col">Notas</th><th scope="col">Acciones</th></tr></thead>
-                    <tbody id="subsTable"><tr><td colspan="7" class="empty-message">Cargando usuarios…</td></tr></tbody>
+                    <thead><tr><th scope="col">Usuario / conexión</th><th scope="col">Suscripción</th><th scope="col">Vencimiento</th><th scope="col">Tiempo restante</th><th scope="col">Aperturas</th><th scope="col">Dispositivo</th><th scope="col">Notas</th><th scope="col">Acciones</th></tr></thead>
+                    <tbody id="subsTable"><tr><td colspan="8" class="empty-message">Cargando usuarios…</td></tr></tbody>
                 </table>
             </div></div>
             <details class="presence-details">
@@ -408,7 +415,9 @@
 <!-- ==================== FIREBASE ==================== -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    import { costaRicaDay, monthRange, summarizeOpenings } from './opening-stats.js';
 
     const firebaseConfig = {
         apiKey: "AIzaSyAaa4Rs4vk2xq0PzXnb9tdLnt1oqqj4qa4",
@@ -431,6 +440,66 @@
 
     const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const normalizeEmail = value => String(value || '').trim().toLowerCase();
+
+    let openingsUnsubscribe = null;
+    let openingsState = 'loading';
+    let openingsMonth = '';
+    let openingsDay = '';
+    let openingCounts = new Map();
+
+    function openingStats(email) {
+        if (openingsState !== 'ready') return null;
+        const counts = openingCounts.get(normalizeEmail(email));
+        return { today: counts?.days[costaRicaDay()] || 0, total: counts?.total || 0, days: counts?.days || {} };
+    }
+
+    function openingCell(email) {
+        const stats = openingStats(email);
+        if (!stats) return `<span>${openingsState === 'error' ? 'Sin información' : 'Consultando…'}</span>`;
+        const daily = Object.entries(stats.days).sort(([a], [b]) => b.localeCompare(a))
+            .map(([day, total]) => `<li>${day.slice(8)}/${day.slice(5, 7)}: <strong>${total}</strong></li>`).join('');
+        return `<div class="opening-counts"><p>Hoy: <strong>${stats.today}</strong></p><p>Mes: <strong>${stats.total}</strong></p>
+            <details><summary>Ver por día</summary>${daily ? `<ul class="opening-days">${daily}</ul>` : '<p>Sin aperturas registradas.</p>'}</details></div>`;
+    }
+
+    function refreshOpeningCalendar() {
+        const day = costaRicaDay();
+        const month = day.slice(0, 7);
+        if (month !== openingsMonth) {
+            if (openingsUnsubscribe) openingsUnsubscribe();
+            openingsMonth = month;
+            openingsDay = day;
+            openingsState = 'loading';
+            openingCounts = new Map();
+            const [start, end] = monthRange(day);
+            const status = document.getElementById('openingsStatus');
+            status.textContent = 'Consultando aperturas del mes…';
+            window.renderList();
+            try {
+                openingsUnsubscribe = onSnapshot(query(collection(db, 'aperturas'), where('day', '>=', start), where('day', '<', end)), snapshot => {
+                    if (month !== openingsMonth) return;
+                    openingCounts = summarizeOpenings(snapshot.docs.map(item => item.data()), month);
+                    openingsState = 'ready';
+                    status.textContent = `Aperturas de ${month} · Hora de Costa Rica. El historial comienza al activar el registro en la aplicación.`;
+                    window.renderList();
+                }, error => {
+                    if (month !== openingsMonth) return;
+                    openingsState = 'error';
+                    status.textContent = 'No se pudieron consultar las aperturas. Revisa la conexión y los permisos de Firestore para aperturas.';
+                    console.warn('Error consultando aperturas:', error);
+                    window.renderList();
+                });
+            } catch (error) {
+                openingsState = 'error';
+                status.textContent = 'No se pudo iniciar la consulta de aperturas.';
+                window.renderList();
+            }
+        } else if (day !== openingsDay) {
+            openingsDay = day;
+            window.renderList();
+        }
+    }
+
     const isRecentPresence = item => {
         const age = Date.now() - Number(item.lastSeenMs);
         return Number(item.lastSeenMs) > 0 && age >= 0 && age <= 90000;
@@ -483,6 +552,7 @@
     });
 
     function renderPresence() {
+        refreshOpeningCalendar();
         const online = presenceState === 'ready' ? latestPresence.filter(isRecentPresence) : [];
         const container = document.getElementById('onlineClients');
         const count = document.getElementById('onlineCount');
@@ -520,6 +590,7 @@
         if (presenceRefreshTimer) clearInterval(presenceRefreshTimer);
         const status = document.getElementById('presenceStatus');
         presenceState = 'loading';
+        refreshOpeningCalendar();
         try {
             presenceUnsubscribe = onSnapshot(collection(db, 'presencia'), snap => {
                 latestPresence = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -573,6 +644,7 @@
         if (confirm('¿Cerrar sesión de administrador?')) {
             sessionStorage.removeItem('boxplay_admin_logged');
             if (presenceUnsubscribe) presenceUnsubscribe();
+            if (openingsUnsubscribe) openingsUnsubscribe();
             if (presenceRefreshTimer) clearInterval(presenceRefreshTimer);
             location.reload();
         }
@@ -589,6 +661,10 @@
     // CARGAR SUSCRIPTORES
     // ============================================
     window.cargarSuscriptores = async () => {
+        if (openingsState === 'error') {
+            openingsMonth = '';
+            refreshOpeningCalendar();
+        }
         try {
             const snap = await getDocs(collection(db, "suscripciones"));
             const list = [];
@@ -602,7 +678,7 @@
         } catch (err) {
             console.error(err);
             document.getElementById('listCount').textContent = 'No se pudo actualizar la lista.';
-            document.getElementById('subsTable').innerHTML = `<tr><td colspan="7" class="empty-message">No se pudieron cargar los usuarios. Revisa la conexión e intenta actualizar la lista.</td></tr>`;
+            document.getElementById('subsTable').innerHTML = `<tr><td colspan="8" class="empty-message">No se pudieron cargar los usuarios. Revisa la conexión e intenta actualizar la lista.</td></tr>`;
         }
     };
 
@@ -643,7 +719,7 @@
             const message = filterStatus === 'online' && presenceState !== 'ready'
                 ? 'La información de conexión aún no está disponible.'
                 : !window.subsCache.length ? 'Todavía no hay usuarios. Agrega el primero desde Inicio.' : 'No hay usuarios que coincidan con tu búsqueda o filtro.';
-            tbody.innerHTML = `<tr><td colspan="7" class="empty-message">${message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="empty-message">${message}</td></tr>`;
             return;
         }
         tbody.innerHTML = list.map((s, index) => {
@@ -665,6 +741,7 @@
                 <td data-label="Suscripción">${badge}</td>
                 <td data-label="Vencimiento">${exp.toLocaleDateString('es-CR')}</td>
                 <td data-label="Tiempo restante">${daysText}</td>
+                <td data-label="Aperturas">${openingCell(s.email)}</td>
                 <td data-label="Dispositivo"><span title="${escapeHTML(device)}">${device ? escapeHTML(device.slice(0, 12)) + (device.length > 12 ? '…' : '') : 'Sin registrar'}</span></td>
                 <td data-label="Nombre o notas"><span class="subscriber-note">${escapeHTML(s.notes || 'Sin notas')}</span></td>
                 <td><div class="subscriber-actions">
@@ -825,7 +902,7 @@
             return;
         }
         const hoy = new Date();
-        const headers = ['Correo', 'Estado', 'Vence', 'Dias_Restantes', 'Dispositivos', 'Notas', 'Ultimo_Pago'];
+        const headers = ['Correo', 'Estado', 'Vence', 'Dias_Restantes', 'Dispositivos', 'Notas', 'Ultimo_Pago', 'Aperturas_Hoy', 'Aperturas_Mes'];
         const rows = window.subsCache.map(s => {
             const exp = new Date(s.expires_at);
             const dias = Math.ceil((exp - hoy) / (1000 * 60 * 60 * 24));
@@ -837,7 +914,9 @@
                 activo ? dias : 0,
                 (s.devices || []).length,
                 (s.notes || '').replace(/,/g, ';'),
-                s.lastPayment ? new Date(s.lastPayment).toLocaleDateString('es-CR') : ''
+                s.lastPayment ? new Date(s.lastPayment).toLocaleDateString('es-CR') : '',
+                openingStats(s.email)?.today ?? 'Sin informacion',
+                openingStats(s.email)?.total ?? 'Sin informacion'
             ];
         });
         const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
