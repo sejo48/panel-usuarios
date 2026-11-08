@@ -316,8 +316,8 @@
                     <form id="subscriberForm" class="user-form" onsubmit="event.preventDefault(); crearSuscriptor()">
                         <div class="form-field">
                             <label for="newEmail">Correo electrónico</label>
-                            <input type="email" id="newEmail" name="email" placeholder="usuario@correo.com" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required aria-describedby="emailHelp" />
-                            <small id="emailHelp">Usa el mismo correo con el que ingresará a la aplicación.</small>
+                            <input type="text" id="newEmail" name="email" value="@boxplaytv.com" placeholder="88888888@boxplaytv.com" pattern="[^\s@]+@[^\s@]+\.[^\s@]+" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required aria-describedby="emailHelp" />
+                            <small id="emailHelp">Escribe el teléfono delante de @boxplaytv.com, por ejemplo: 88888888@boxplaytv.com. También puedes usar otro correo completo.</small>
                         </div>
                         <div class="form-field">
                             <label for="newDays">Duración del plan</label>
@@ -400,6 +400,22 @@
 </div>
 
 <script>
+
+    // El campo de texto permite situar el cursor delante del dominio en móviles.
+    const DEFAULT_EMAIL_DOMAIN = '@boxplaytv.com';
+    const newEmailInput = document.getElementById('newEmail');
+    newEmailInput.addEventListener('focus', () => {
+        if (!newEmailInput.value.trim()) newEmailInput.value = DEFAULT_EMAIL_DOMAIN;
+        if (newEmailInput.value === DEFAULT_EMAIL_DOMAIN) {
+            newEmailInput.setSelectionRange(0, 0);
+        }
+    });
+    newEmailInput.addEventListener('click', () => {
+        if (newEmailInput.value === DEFAULT_EMAIL_DOMAIN) {
+            newEmailInput.setSelectionRange(0, 0);
+        }
+    });
+
     window.showSection = (section) => {
         const users = section === 'users';
         document.getElementById('homeSection').hidden = users;
@@ -765,7 +781,11 @@
         const msg = document.getElementById('createMsg');
         const btn = document.getElementById('createBtn');
 
-        if (!document.getElementById('newEmail').checkValidity()) {
+        const emailValidation = document.createElement('input');
+        emailValidation.type = 'email';
+        emailValidation.required = true;
+        emailValidation.value = email;
+        if (!newEmailInput.checkValidity() || !emailValidation.checkValidity()) {
             msg.classList.remove('hidden');
             msg.dataset.state = 'error';
             msg.textContent = '⚠️ Ingresa un correo válido.';
@@ -803,7 +823,7 @@
             msg.classList.remove('hidden');
             msg.dataset.state = 'success';
             msg.textContent = `✅ Suscripción activada para ${email} por ${dias} días.`;
-            document.getElementById('newEmail').value = '';
+            newEmailInput.value = DEFAULT_EMAIL_DOMAIN;
             document.getElementById('newNotes').value = '';
             cargarSuscriptores();
 
