@@ -264,6 +264,59 @@
         .opening-counts summary { cursor: pointer; color: #67e8f9; }
         .opening-days { padding-left: 18px; max-height: 180px; overflow-y: auto; }
         #openingsStatus { color: #94a3b8; font-size: 14px; }
+        .clients-list { border: 1px solid #253248; border-radius: 18px; overflow: hidden; background: #0f172a; }
+        .client-list-item + .client-list-item { border-top: 1px solid #253248; }
+        .client-row { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 160px 130px 16px; gap: 18px; align-items: center; padding: 18px 20px; text-align: left; color: inherit; background: transparent; border: 0; font: inherit; cursor: pointer; }
+        .client-row:hover { background: #12263a; }
+        .client-row:focus-visible { outline-offset: -4px; }
+        .client-identity, .client-totals { min-width: 0; display: grid; gap: 4px; }
+        .client-identity strong { overflow-wrap: anywhere; }
+        .client-identity span, .client-totals span { font-size: 13px; color: #94a3b8; overflow-wrap: anywhere; }
+        .client-totals strong { font-size: 14px; }
+        .client-connection { font-size: 13px; color: #94a3b8; }
+        .client-connection[data-state="online"] { color: #6ee7b7; }
+        .client-connection[data-state="unknown"] { color: #fcd34d; }
+        .client-arrow { color: #67e8f9; font-size: 26px; }
+        .profile-back { margin-bottom: 20px; }
+        .profile-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; margin-bottom: 28px; }
+        .profile-grid .form-card { padding: 24px; }
+        .profile-grid h3 { margin: 0 0 16px; }
+        .profile-details > summary { font-size: 16px; font-weight: 700; cursor: pointer; min-height: 30px; }
+        .profile-details[open] > summary { margin-bottom: 20px; }
+        .profile-grid .profile-details { padding: 16px; }
+        .profile-summary { color: #cbd5e1; }
+        .profile-access-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+        .profile-access-heading h3 { margin: 0; }
+        .access-row { background: #0f172a; border: 1px solid #253248; border-radius: 16px; padding: 22px; margin-bottom: 16px; min-width: 0; }
+        .access-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+        .access-heading h4 { margin: 0 0 4px; font-size: 18px; overflow-wrap: anywhere; }
+        .access-heading .subscriber-email { font-size: 14px; color: #94a3b8; }
+        .access-data { display: grid; grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1.4fr); gap: 22px; margin: 20px 0; }
+        .access-data > div { min-width: 0; }
+        .access-data p { margin: 0 0 8px; }
+        .field-caption { color: #94a3b8; font-size: 12px; font-weight: 700; }
+        .device-line { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+        .device-line code { overflow-wrap: anywhere; min-width: 0; flex: 1; font-size: 12px; }
+        .device-warning { color: #fcd34d; font-size: 13px; }
+        .access-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 16px; border-top: 1px solid #253248; }
+        #clientMsg { padding: 14px 16px; border: 1px solid #164e63; border-radius: 12px; overflow-wrap: anywhere; }
+        [data-state="error"]#clientMsg { color: #fda4af; border-color: #9f1239; }
+        [data-state="success"]#clientMsg { color: #6ee7b7; }
+        button:disabled { opacity: .5; cursor: wait; }
+        @media (max-width: 700px) {
+            .users-toolbar { grid-template-columns: minmax(0, 1fr) 110px; padding: 16px; gap: 12px; }
+            .users-toolbar .filter-field:first-child { grid-column: 1 / -1; }
+            .users-toolbar .btn-secondary { min-height: 50px; padding: 8px; }
+            .client-row { grid-template-columns: minmax(0, 1fr) auto 12px; gap: 12px; padding: 15px 14px; }
+            .client-totals { text-align: right; }
+            .client-totals span { max-width: 125px; }
+            .client-connection { grid-column: 1 / 3; grid-row: 2; font-size: 12px; }
+            .client-arrow { grid-column: 3; grid-row: 1 / 3; }
+            .profile-grid, .access-data { grid-template-columns: minmax(0, 1fr); }
+            .access-row { padding: 18px 16px; }
+            .access-data { gap: 14px; }
+            .access-actions button { flex: 1 1 130px; }
+        }
     </style>
 </head>
 <body>
@@ -301,19 +354,25 @@
         </button>
         <button type="button" id="navUsers" class="nav-button" aria-controls="usersSection" onclick="showSection('users')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-3-5"/></svg>
-            <span>Usuarios</span>
+            <span>Clientes</span>
         </button>
     </nav>
 
     <main class="panel-main">
         <section id="homeSection" aria-labelledby="homeHeading">
             <div class="section-heading">
-                <div><p class="eyebrow">Inicio</p><h2 id="homeHeading" tabindex="-1">Agrega un nuevo usuario</h2><p>Activa una suscripción o renueva una existente desde un solo lugar.</p></div>
+                <div><p class="eyebrow">Inicio</p><h2 id="homeHeading" tabindex="-1">Activa un acceso</h2><p>Un cliente puede tener varios accesos. Cada acceso corresponde a un dispositivo.</p></div>
             </div>
             <div class="home-layout">
                 <div class="form-card">
-                    <div class="card-heading"><h3>Datos de la suscripción</h3><p>Si el correo ya existe, el tiempo se sumará a su suscripción.</p></div>
+                    <div class="card-heading"><h3>Cliente y acceso</h3><p>Elige un cliente existente o crea su ficha. Para renovar, abre el acceso en la ficha del cliente.</p></div>
                     <form id="subscriberForm" class="user-form" onsubmit="event.preventDefault(); crearSuscriptor()">
+                        <div class="form-field"><label for="newClient">Cliente</label><select id="newClient"><option value="">Crear un cliente nuevo</option></select></div>
+                        <div id="newClientFields" class="user-form">
+                            <div class="form-field"><label for="newClientName">Nombre del cliente</label><input id="newClientName" autocomplete="name" required maxlength="160" placeholder="Nombre y apellidos" /></div>
+                            <div class="form-field"><label for="newClientPhone">Teléfono <span>(opcional)</span></label><input id="newClientPhone" type="tel" autocomplete="tel" maxlength="40" placeholder="8888-8888" /></div>
+                        </div>
+                        <div class="form-field"><label for="newAccessName">Nombre del acceso <span>(opcional)</span></label><input id="newAccessName" maxlength="100" placeholder="TV de la sala, celular…" /></div>
                         <div class="form-field">
                             <label for="newEmail">Correo electrónico</label>
                             <input type="text" id="newEmail" name="email" value="@boxplaytv.com" placeholder="88888888@boxplaytv.com" pattern="[^\s@]+@[^\s@]+\.[^\s@]+" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required aria-describedby="emailHelp" />
@@ -331,11 +390,11 @@
                             </select>
                         </div>
                         <div class="form-field">
-                            <label for="newNotes">Nombre o notas <span>(opcional)</span></label>
-                            <textarea id="newNotes" name="notes" rows="3" placeholder="Nombre del cliente, teléfono o referencia de pago"></textarea>
+                            <label for="newNotes">Notas del acceso <span>(opcional)</span></label>
+                            <textarea id="newNotes" name="notes" rows="3" placeholder="Referencia de pago u otra observación"></textarea>
                         </div>
                         <div class="form-submit">
-                            <button id="createBtn" type="submit" class="btn-primary">Activar usuario</button>
+                            <button id="createBtn" type="submit" class="btn-primary">Activar acceso</button>
                             <p id="createMsg" class="hidden" role="status" aria-live="polite"></p>
                         </div>
                     </form>
@@ -344,45 +403,65 @@
                     <div class="summary-card">
                         <h3>Tu panel de un vistazo</h3>
                         <div class="summary-grid">
-                            <div class="stat-card"><p>Usuarios</p><strong id="statTotal">—</strong></div>
-                            <div class="stat-card active"><p>Activos</p><strong id="statActive">—</strong></div>
-                            <div class="stat-card expired"><p>Vencidos</p><strong id="statExpired">—</strong></div>
+                            <div class="stat-card"><p>Clientes</p><strong id="statTotal">—</strong></div>
+                            <div class="stat-card active"><p>Accesos activos</p><strong id="statActive">—</strong></div>
+                            <div class="stat-card expired"><p>Accesos vencidos</p><strong id="statExpired">—</strong></div>
                             <div class="stat-card revenue"><p>Ingresos estimados / mes</p><strong id="statRevenue">—</strong></div>
                         </div>
-                        <button type="button" class="summary-link" onclick="showSection('users')">Ver lista de usuarios <span aria-hidden="true">→</span></button>
+                        <button type="button" class="summary-link" onclick="showSection('users')">Ver lista de clientes <span aria-hidden="true">→</span></button>
                     </div>
-                    <p class="help-note"><strong>Una suscripción, un dispositivo.</strong><br>Podrás renovar, editar notas o liberar el equipo desde la sección Usuarios.</p>
+                    <p class="help-note"><strong>Un cliente, varios accesos.</strong><br>Cada acceso conserva su suscripción de ₡3.000 al mes por dispositivo. Adminístralos desde la ficha del cliente.</p>
                 </aside>
             </div>
         </section>
 
         <section id="usersSection" aria-labelledby="usersHeading" hidden>
             <div class="section-heading">
-                <div><p class="eyebrow">Usuarios</p><h2 id="usersHeading" tabindex="-1">Tus usuarios, al día</h2><p>Consulta sus suscripciones y quién está en línea.</p></div>
-                <div class="users-actions"><button type="button" class="btn-secondary" onclick="exportarCSV()">Exportar CSV</button><button type="button" class="btn-primary" onclick="showSection('home'); document.getElementById('newEmail').focus()">+ Nuevo usuario</button></div>
+                <div><p class="eyebrow">Clientes</p><h2 id="usersHeading" tabindex="-1">Tus clientes</h2><p>Busca al cliente y abre su ficha para ver todos sus accesos.</p></div>
+                <div class="users-actions"><button type="button" class="btn-secondary" onclick="exportarCSV()">Exportar CSV</button><button type="button" id="newClientButton" class="btn-primary">+ Nuevo cliente</button></div>
             </div>
             <div class="users-toolbar">
-                <div class="filter-field"><label for="searchInput">Buscar usuario</label><input type="search" id="searchInput" placeholder="Correo, nombre o nota" oninput="renderList()" /></div>
+                <div class="filter-field"><label for="searchInput">Buscar cliente</label><input type="search" id="searchInput" placeholder="Nombre, teléfono o correo de un acceso" oninput="renderList()" /></div>
                 <div class="filter-field"><label for="filterStatus">Filtrar por</label><select id="filterStatus" onchange="renderList()">
-                    <option value="all">Todos los usuarios</option><option value="online">En línea</option><option value="active">Suscripción activa</option><option value="expired">Suscripción vencida</option><option value="expiring">Vencen en 7 días</option>
+                    <option value="all">Todos los clientes</option><option value="online">En línea</option><option value="active">Con accesos activos</option><option value="expired">Con accesos vencidos</option><option value="expiring">Vencen en 7 días</option>
                 </select></div>
                 <button type="button" class="btn-secondary" onclick="cargarSuscriptores()">Actualizar lista</button>
             </div>
             <p id="openingsStatus" role="status">Consultando aperturas del mes…</p>
-            <p id="listCount" class="list-count" role="status">Cargando usuarios…</p>
-            <div class="subs-table-shell"><div class="subs-table-scroll">
-                <table class="subs-table" aria-label="Lista de usuarios">
-                    <thead><tr><th scope="col">Usuario / conexión</th><th scope="col">Suscripción</th><th scope="col">Vencimiento</th><th scope="col">Tiempo restante</th><th scope="col">Aperturas</th><th scope="col">Dispositivo</th><th scope="col">Notas</th><th scope="col">Acciones</th></tr></thead>
-                    <tbody id="subsTable"><tr><td colspan="8" class="empty-message">Cargando usuarios…</td></tr></tbody>
-                </table>
-            </div></div>
+            <p id="listCount" class="list-count" role="status">Cargando clientes…</p>
+            <div id="clientsList" class="clients-list" role="list" aria-label="Lista de clientes"><p class="empty-message">Cargando clientes…</p></div>
             <details class="presence-details">
                 <summary>Actividad de dispositivos <span id="onlineCount">Conectando…</span></summary>
                 <p class="presence-caption">Un dispositivo está en línea si reportó actividad en los últimos 90 segundos.</p>
                 <div id="onlineClients" class="online-clients-grid"><p class="presence-caption">Esperando actividad…</p></div>
                 <p id="presenceStatus" role="status">Conectando con el registro de actividad…</p>
             </details>
-            <p class="help-note">Renovar suma 30 días. Liberar equipo permite usar otro dispositivo. Eliminar un usuario requiere confirmación.</p>
+            <p class="help-note">Los registros anteriores aparecen por separado. Desde una ficha puedes vincular los accesos que pertenecen a esa persona.</p>
+        </section>
+
+        <section id="clientSection" aria-labelledby="clientHeading" hidden>
+            <button type="button" class="btn-secondary profile-back" onclick="showSection('users')">← Volver a clientes</button>
+            <div class="section-heading"><div><p class="eyebrow">Ficha del cliente</p><h2 id="clientHeading" tabindex="-1">Cliente</h2><p id="clientPhoneDisplay"></p><p id="clientSummary" class="profile-summary"></p><p id="clientOpenings"></p></div></div>
+            <p id="clientMsg" role="status" aria-live="polite" hidden></p>
+            <div class="profile-grid">
+                <details class="form-card profile-details"><summary>Editar datos del cliente</summary>
+                  <form id="clientForm" class="user-form">
+                    <div class="form-field"><label for="clientName">Nombre</label><input id="clientName" autocomplete="name" required maxlength="160" /></div>
+                    <div class="form-field"><label for="clientPhone">Teléfono</label><input id="clientPhone" type="tel" autocomplete="tel" maxlength="40" /></div>
+                    <div class="form-field"><label for="clientNotes">Notas del cliente</label><textarea id="clientNotes" rows="3"></textarea></div>
+                    <button type="submit" class="btn-primary" data-client-write>Guardar ficha</button>
+                  </form>
+                </details>
+                <details class="form-card profile-details"><summary>Vincular acceso existente</summary><div class="user-form">
+                    <p class="presence-caption">Reúne aquí los accesos de esta persona. Su vencimiento, pagos y equipos se conservan.</p>
+                    <div class="form-field"><label for="attachSearch">Buscar acceso</label><input id="attachSearch" type="search" placeholder="Correo, nombre o nota" /></div>
+                    <div class="form-field"><label for="attachEmail">Acceso a vincular</label><select id="attachEmail"><option value="">Selecciona un acceso</option></select></div>
+                    <button type="button" id="attachButton" class="btn-secondary" data-client-write>Vincular acceso</button>
+                </div></details>
+            </div>
+            <div class="profile-access-heading"><h3>Accesos y dispositivos</h3><button type="button" id="addClientAccess" class="btn-primary">+ Nuevo acceso</button></div>
+            <p class="help-note">Cada acceso admite un dispositivo. Renovar suma 30 días solo al acceso elegido. Cambiar equipo permite registrar otro.</p>
+            <div id="clientAccesses"></div>
         </section>
     </main>
 </div>
@@ -417,13 +496,12 @@
     });
 
     window.showSection = (section) => {
-        const users = section === 'users';
-        document.getElementById('homeSection').hidden = users;
-        document.getElementById('usersSection').hidden = !users;
-        document.getElementById('navHome').toggleAttribute('aria-current', !users);
-        document.getElementById('navUsers').toggleAttribute('aria-current', users);
+        const users = section !== 'home';
+        for (const name of ['home', 'users', 'client']) document.getElementById(name + 'Section').hidden = section !== name;
+        document.getElementById('navHome').removeAttribute('aria-current');
+        document.getElementById('navUsers').removeAttribute('aria-current');
         document.getElementById(users ? 'navUsers' : 'navHome').setAttribute('aria-current', 'page');
-        document.getElementById(users ? 'usersHeading' : 'homeHeading').focus({ preventScroll: true });
+        document.getElementById(section + 'Heading').focus({ preventScroll: true });
         window.scrollTo({ top: 0, behavior: 'instant' });
     };
 </script>
@@ -431,9 +509,10 @@
 <!-- ==================== FIREBASE ==================== -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, onSnapshot, query, where, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     import { costaRicaDay, monthRange, summarizeOpenings } from './opening-stats.js';
+    import { createClientManager } from './client-manager.js';
 
     const firebaseConfig = {
         apiKey: "AIzaSyAaa4Rs4vk2xq0PzXnb9tdLnt1oqqj4qa4",
@@ -496,7 +575,7 @@
                     if (month !== openingsMonth) return;
                     openingCounts = summarizeOpenings(snapshot.docs.map(item => item.data()), month);
                     openingsState = 'ready';
-                    status.textContent = `Aperturas de ${month} · Hora de Costa Rica. El historial comienza al activar el registro en la aplicación.`;
+                    status.textContent = `Aperturas de ${month} · Hora de Costa Rica.`;
                     window.renderList();
                 }, error => {
                     if (month !== openingsMonth) return;
@@ -533,10 +612,11 @@
     }
 
     function updateConnectionBadges() {
-        if (document.getElementById('filterStatus').value === 'online') {
+        if (!document.getElementById('usersSection').hidden && document.getElementById('filterStatus').value === 'online') {
             window.renderList();
             return;
         }
+        clientManager.updateConnections();
         document.querySelectorAll('[data-presence-email]').forEach(button => {
             const connection = connectionFor(button.dataset.presenceEmail);
             button.dataset.state = connection.state;
@@ -545,27 +625,6 @@
             document.getElementById(button.getAttribute('aria-controls')).textContent = connection.detail;
         });
     }
-
-    document.getElementById('subsTable').addEventListener('click', event => {
-        const button = event.target.closest('button');
-        if (!button) return;
-        if (button.hasAttribute('data-presence-email')) {
-            const detail = document.getElementById(button.getAttribute('aria-controls'));
-            detail.hidden = !detail.hidden;
-            button.setAttribute('aria-expanded', String(!detail.hidden));
-            return;
-        }
-        const email = button.closest('[data-email]')?.dataset.email;
-        const actions = { note: window.editarNota, renew: window.renovar, device: window.resetDevices, delete: window.eliminar };
-        if (email && actions[button.dataset.action]) actions[button.dataset.action](email);
-        if (email && button.dataset.action === 'whatsapp') {
-            const sub = window.subsCache.find(item => item.email === email);
-            const days = Math.ceil((new Date(sub.expires_at) - new Date()) / 86400000);
-            const active = sub.status === 'active' && new Date(sub.expires_at) >= new Date();
-            const message = `Hola! Te escribo de Boxplaytv. Tu suscripción ${active ? `vence en ${days} días` : 'está vencida'}. ¿Deseas renovar por ₡3,000?`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
-        }
-    });
 
     function renderPresence() {
         refreshOpeningCalendar();
@@ -587,7 +646,7 @@
             container.innerHTML = online.map(item => {
                 const emailRaw = String(item.email || '').trim().toLowerCase();
                 const subscription = (window.subsCache || []).find(s => String(s.email || '').trim().toLowerCase() === emailRaw);
-                const displayName = escapeHTML(subscription?.notes || '');
+                const displayName = escapeHTML(subscription?.clientName || subscription?.notes || '');
                 const email = escapeHTML(item.email || 'Correo no registrado');
                 const device = escapeHTML(item.deviceId || 'Dispositivo desconocido');
                 return `<article class="online-client-card">
@@ -598,7 +657,7 @@
                 </article>`;
             }).join('');
         }
-        status.textContent = `Última actualización: ${new Date().toLocaleTimeString('es-CR')}. El estado puede tardar hasta 90 segundos en cambiar a desconectado.`;
+        status.textContent = `Última actualización: ${new Date().toLocaleTimeString('es-CR', { timeZone: 'America/Costa_Rica', hour12: false })}. El estado puede tardar hasta 90 segundos en cambiar a desconectado.`;
     }
 
     function iniciarEscuchaPresencia() {
@@ -639,6 +698,10 @@
 
     window.db = db;
     window.subsCache = [];
+    const clientManager = createClientManager({ db, doc, runTransaction,
+        getSubscriptions: () => window.subsCache, connectionFor, openingCell, openingStats, escapeHTML,
+        reload: () => window.cargarSuscriptores() });
+
 
     // ============================================
     // AUTENTICACIÓN
@@ -684,17 +747,19 @@
         try {
             const snap = await getDocs(collection(db, "suscripciones"));
             const list = [];
-            snap.forEach(d => list.push({ email: d.id, ...d.data() }));
+            snap.forEach(d => list.push({ ...d.data(), email: d.id }));
             list.sort((a, b) => new Date(b.expires_at) - new Date(a.expires_at));
             window.subsCache = list;
             renderList();
             updateStats();
             // Vuelve a mostrar las tarjetas de presencia con el nombre de las Notas.
             renderPresence();
+            return true;
         } catch (err) {
             console.error(err);
             document.getElementById('listCount').textContent = 'No se pudo actualizar la lista.';
-            document.getElementById('subsTable').innerHTML = `<tr><td colspan="8" class="empty-message">No se pudieron cargar los usuarios. Revisa la conexión e intenta actualizar la lista.</td></tr>`;
+            document.getElementById('clientsList').innerHTML = '<p class="empty-message">No se pudieron cargar los clientes. Revisa la conexión e intenta actualizar la lista.</p>';
+            return false;
         }
     };
 
@@ -703,139 +768,14 @@
         const list = window.subsCache;
         const activos = list.filter(s => s.status === 'active' && new Date(s.expires_at) >= hoy).length;
         const vencidos = list.length - activos;
-        document.getElementById('statTotal').textContent = list.length;
+        document.getElementById('statTotal').textContent = clientManager.groups().length;
         document.getElementById('statActive').textContent = activos;
         document.getElementById('statExpired').textContent = vencidos;
         document.getElementById('statRevenue').textContent = '₡' + (activos * PRECIO_MENSUAL).toLocaleString('es-CR');
     };
 
-    window.renderList = () => {
-        const search = document.getElementById('searchInput').value.toLowerCase().trim();
-        const filterStatus = document.getElementById('filterStatus').value;
-        const hoy = new Date();
-        let list = window.subsCache.filter(s =>
-            normalizeEmail(s.email).includes(search) || String(s.notes || '').toLowerCase().includes(search)
-        );
-
-        if (filterStatus === 'online') {
-            list = list.filter(s => connectionFor(s.email).state === 'online');
-        } else if (filterStatus === 'active') {
-            list = list.filter(s => s.status === 'active' && new Date(s.expires_at) >= hoy);
-        } else if (filterStatus === 'expired') {
-            list = list.filter(s => s.status !== 'active' || new Date(s.expires_at) < hoy);
-        } else if (filterStatus === 'expiring') {
-            list = list.filter(s => {
-                const days = Math.ceil((new Date(s.expires_at) - hoy) / 86400000);
-                return s.status === 'active' && days >= 0 && days <= 7;
-            });
-        }
-        document.getElementById('listCount').textContent = `${list.length} ${list.length === 1 ? 'usuario' : 'usuarios'} · ${window.subsCache.length} en total`;
-        const tbody = document.getElementById('subsTable');
-        if (!list.length) {
-            const message = filterStatus === 'online' && presenceState !== 'ready'
-                ? 'La información de conexión aún no está disponible.'
-                : !window.subsCache.length ? 'Todavía no hay usuarios. Agrega el primero desde Inicio.' : 'No hay usuarios que coincidan con tu búsqueda o filtro.';
-            tbody.innerHTML = `<tr><td colspan="8" class="empty-message">${message}</td></tr>`;
-            return;
-        }
-        tbody.innerHTML = list.map((s, index) => {
-            const exp = new Date(s.expires_at);
-            const days = Math.ceil((exp - hoy) / 86400000);
-            const active = s.status === 'active' && exp >= hoy;
-            const expiring = active && days <= 7;
-            const badge = `<span class="subscription-badge ${!active ? 'badge-expired' : expiring ? 'badge-pending' : 'badge-active'}">${!active ? 'Vencida' : expiring ? 'Por vencer' : 'Activa'}</span>`;
-            const daysText = active ? `${days} días` : 'Vencida';
-            const devices = Array.isArray(s.devices) ? s.devices : [];
-            const device = String(devices[0] || '');
-            const connection = connectionFor(s.email);
-            const email = escapeHTML(s.email);
-            return `<tr class="subscriber-row" data-email="${email}">
-                <td><span class="subscriber-email">${email}</span>
-                    <button type="button" class="presence-button" data-presence-email="${email}" data-state="${connection.state}" aria-label="${connection.label}: ${email}. Ver detalle de conexión" aria-expanded="false" aria-controls="connection-${index}">${connection.label}</button>
-                    <p id="connection-${index}" class="connection-detail" hidden>${escapeHTML(connection.detail)}</p>
-                </td>
-                <td data-label="Suscripción">${badge}</td>
-                <td data-label="Vencimiento">${exp.toLocaleDateString('es-CR')}</td>
-                <td data-label="Tiempo restante">${daysText}</td>
-                <td data-label="Aperturas">${openingCell(s.email)}</td>
-                <td data-label="Dispositivo"><span title="${escapeHTML(device)}">${device ? escapeHTML(device.slice(0, 12)) + (device.length > 12 ? '…' : '') : 'Sin registrar'}</span></td>
-                <td data-label="Nombre o notas"><span class="subscriber-note">${escapeHTML(s.notes || 'Sin notas')}</span></td>
-                <td><div class="subscriber-actions">
-                    <button type="button" class="btn-secondary" data-action="renew">Renovar</button>
-                    <button type="button" class="btn-whatsapp" data-action="whatsapp">WhatsApp</button>
-                    <button type="button" class="btn-secondary" data-action="note">Editar nota</button>
-                    <button type="button" class="btn-secondary" data-action="device">Liberar equipo</button>
-                    <button type="button" class="btn-danger" data-action="delete">Eliminar usuario</button>
-                </div></td>
-            </tr>`;
-        }).join('');
-    };
-
-    // ============================================
-    // CREAR SUSCRIPTOR
-    // ============================================
-    window.crearSuscriptor = async () => {
-        const email = document.getElementById('newEmail').value.trim().toLowerCase();
-        const dias = parseInt(document.getElementById('newDays').value);
-        const notes = document.getElementById('newNotes').value.trim();
-        const msg = document.getElementById('createMsg');
-        const btn = document.getElementById('createBtn');
-
-        const emailValidation = document.createElement('input');
-        emailValidation.type = 'email';
-        emailValidation.required = true;
-        emailValidation.value = email;
-        if (!newEmailInput.checkValidity() || !emailValidation.checkValidity()) {
-            msg.classList.remove('hidden');
-            msg.dataset.state = 'error';
-            msg.textContent = '⚠️ Ingresa un correo válido.';
-            return;
-        }
-
-        btn.disabled = true;
-        btn.textContent = '⏳ Creando...';
-
-        try {
-            const refCliente = doc(db, "suscripciones", email);
-            const snapCliente = await getDoc(refCliente);
-            const datosPrevios = snapCliente.exists() ? snapCliente.data() : null;
-
-            const hoy = new Date();
-            const expActual = datosPrevios && datosPrevios.expires_at ? new Date(datosPrevios.expires_at) : hoy;
-            const fechaBase = expActual > hoy ? expActual : hoy;
-            fechaBase.setDate(fechaBase.getDate() + dias);
-
-            const montoActual = dias === 1 ? 0 : dias === 30 ? 3000 : dias === 60 ? 6000 : dias === 90 ? 9000 : dias === 180 ? 18000 : 36000;
-            const totalAcumulado = (datosPrevios && datosPrevios.totalPaid ? Number(datosPrevios.totalPaid) : 0) + montoActual;
-
-            const data = {
-                status: "active",
-                expires_at: fechaBase.toISOString(),
-                devices: datosPrevios ? (datosPrevios.devices || []) : [],
-                createdAt: datosPrevios && datosPrevios.createdAt ? datosPrevios.createdAt : new Date().toISOString(),
-                lastPayment: new Date().toISOString(),
-                totalPaid: totalAcumulado
-            };
-            if (notes) data.notes = notes;
-
-            await setDoc(refCliente, data, { merge: true });
-
-            msg.classList.remove('hidden');
-            msg.dataset.state = 'success';
-            msg.textContent = `✅ Suscripción activada para ${email} por ${dias} días.`;
-            newEmailInput.value = DEFAULT_EMAIL_DOMAIN;
-            document.getElementById('newNotes').value = '';
-            cargarSuscriptores();
-
-        } catch (err) {
-            msg.classList.remove('hidden');
-            msg.dataset.state = 'error';
-            msg.textContent = '❌ Error: ' + err.message;
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Activar usuario';
-        }
-    };
+    window.renderList = () => clientManager.render();
+    window.crearSuscriptor = () => clientManager.activate();
 
     // ============================================
     // RENOVAR (AÑADIR 30 DÍAS)
@@ -861,7 +801,7 @@
                         lastPayment: new Date().toISOString(),
                         totalPaid: nuevoTotal
                     });
-                    cargarSuscriptores();
+                    await cargarSuscriptores();
                 } catch (err) { alert("Error: " + err.message); }
             }
         );
@@ -877,7 +817,7 @@
             async () => {
                 try {
                     await updateDoc(doc(db, "suscripciones", email), { devices: [] });
-                    cargarSuscriptores();
+                    await cargarSuscriptores();
                 } catch (err) { alert("Error: " + err.message); }
             }
         );
@@ -893,7 +833,7 @@
         if (nuevaNota === null) return;
         try {
             await updateDoc(doc(db, "suscripciones", email), { notes: nuevaNota.trim() });
-            cargarSuscriptores();
+            await cargarSuscriptores();
         } catch (err) { alert("Error: " + err.message); }
     };
 
@@ -902,12 +842,12 @@
     // ============================================
     window.eliminar = (email) => {
         showConfirm(
-            "🗑️ Eliminar suscriptor",
+            "🗑️ Eliminar acceso",
             `⚠️ Esta acción borra PERMANENTEMENTE a ${email}. No se puede deshacer. ¿Continuar?`,
             async () => {
                 try {
                     await deleteDoc(doc(db, "suscripciones", email));
-                    cargarSuscriptores();
+                    await cargarSuscriptores();
                 } catch (err) { alert("Error: " + err.message); }
             }
         );
@@ -922,24 +862,26 @@
             return;
         }
         const hoy = new Date();
-        const headers = ['Correo', 'Estado', 'Vence', 'Dias_Restantes', 'Dispositivos', 'Notas', 'Ultimo_Pago', 'Aperturas_Hoy', 'Aperturas_Mes'];
+        const headers = ['Cliente_ID', 'Cliente', 'Telefono', 'Acceso', 'Correo', 'Estado', 'Vence', 'Dias_Restantes', 'Dispositivos', 'Notas', 'Ultimo_Pago', 'Aperturas_Hoy', 'Aperturas_Mes'];
         const rows = window.subsCache.map(s => {
             const exp = new Date(s.expires_at);
             const dias = Math.ceil((exp - hoy) / (1000 * 60 * 60 * 24));
             const activo = s.status === 'active' && exp >= hoy;
             return [
+                s.clientId || '', s.clientName || '', s.clientPhone || '', s.accessName || '',
                 s.email,
                 activo ? 'Activo' : 'Vencido',
                 exp.toLocaleDateString('es-CR'),
                 activo ? dias : 0,
                 (s.devices || []).length,
-                (s.notes || '').replace(/,/g, ';'),
+                s.notes || '',
                 s.lastPayment ? new Date(s.lastPayment).toLocaleDateString('es-CR') : '',
                 openingStats(s.email)?.today ?? 'Sin informacion',
                 openingStats(s.email)?.total ?? 'Sin informacion'
             ];
         });
-        const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const cell = value => /[",\n\r]/.test(String(value)) ? '"' + String(value).replace(/"/g, '""') + '"' : String(value);
+        const csv = [headers, ...rows].map(row => row.map(cell).join(',')).join('\n');
         const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

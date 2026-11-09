@@ -4,7 +4,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const firestore = `
- export const getFirestore=()=>({});
+ export const getFirestore=()=>({}); export async function runTransaction(){throw Error('Unexpected write');}
  export const collection=(_,name)=>({name});
  export const query=(ref,...filters)=>({...ref,filters});
  export const where=(...args)=>args;
@@ -39,27 +39,28 @@ const firestore = `
    if(url.host==='www.gstatic.com')return route.fulfill({contentType:'application/javascript',body:url.pathname.includes('firebase-app')?'export const initializeApp=()=>({});':firestore});
    if(url.host==='panel.test'){
     const name=url.pathname==='/'?'index.html':url.pathname.slice(1);
-    if(['index.html','opening-stats.js'].includes(name))return route.fulfill({contentType:name.endsWith('.js')?'application/javascript':'text/html',body:fs.readFileSync(path.join(root,name))});
+    if(['index.html','opening-stats.js','clients.js','client-manager.js'].includes(name))return route.fulfill({contentType:name.endsWith('.js')?'application/javascript':'text/html',body:fs.readFileSync(path.join(root,name))});
    }
    return route.abort();
   });
   const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('https://panel.test/');
-  await page.getByRole('button',{name:'Usuarios',exact:true}).click();
-  await page.locator('.subscriber-row').first().waitFor();
-  const row=email=>page.locator('.subscriber-row').filter({has:page.locator('.subscriber-email',{hasText:email})});
+  await page.getByRole('button',{name:'Clientes',exact:true}).click();
+  await page.locator('.client-row').first().waitFor();
+  const row=email=>page.locator('.access-row[data-email="'+email+'"]');
+  await page.getByRole('button',{name:'Abrir ficha de a@example.com',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('.opening-counts')?.textContent.includes('Mes: 3'));
   assert.match(await row('a@example.com').innerText(),/Hoy: 2/);
-  assert.match(await row('b@example.com').innerText(),/Mes: 1/);
-  assert.match(await row('c@example.com').innerText(),/Mes: 0/);
   await row('a@example.com').getByText('Ver por día').click();
   assert.match(await row('a@example.com').innerText(),/25\/10: 1/);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  await page.getByRole('button',{name:'Volver a clientes',exact:false}).click();
   const downloadPromise=page.waitForEvent('download');
   await page.getByRole('button',{name:'Exportar CSV'}).click();
   const download=await downloadPromise;
   const csv=fs.readFileSync(await download.path(),'utf8');
   assert.match(csv,/Aperturas_Hoy,Aperturas_Mes/);assert.match(csv,/a@example.com[^\n]*,2,3/);
+  await page.getByRole('button',{name:'Abrir ficha de a@example.com',exact:true}).click();
   await page.evaluate(()=>{window.__now=Date.parse('2026-10-27T06:00:00Z');window.__timers.forEach(fn=>fn());});
   assert.match(await row('a@example.com').innerText(),/Hoy: 0/);
   await page.evaluate(()=>window.__listeners.aperturas.error(Error('permission-denied')));
